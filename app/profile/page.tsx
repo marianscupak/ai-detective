@@ -1,8 +1,3 @@
-const ProfilePage = () => {
-  return (
-    <div className="">
-    </div>
-  );
-};
+const ProfilePage = () => <div className="">Profile</div>;
 
 export default ProfilePage;
