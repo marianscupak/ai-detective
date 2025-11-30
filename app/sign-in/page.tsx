@@ -1,8 +1,8 @@
-import { SigninButton } from "./SigninButton";
+import { SigninButton } from "./sign-in-button";
 
 const SigninPage = () => {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center text-black">
+    <div className="w-full h-full flex items-center justify-center text-black">
       <SigninButton />
     </div>
   );
