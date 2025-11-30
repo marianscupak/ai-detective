@@ -1,11 +1,11 @@
-import { SigninButton } from "./SigninButton";
+import { SigninButton } from './SigninButton';
 
 const SigninPage = () => {
-  return (
-    <div className="min-h-screen w-full flex items-center justify-center text-black">
-      <SigninButton />
-    </div>
-  );
+	return (
+		<div className="flex min-h-screen w-full items-center justify-center text-black">
+			<SigninButton />
+		</div>
+	);
 };
 
 export default SigninPage;

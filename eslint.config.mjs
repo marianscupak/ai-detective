@@ -15,9 +15,11 @@ export default [
 		ignores: [
 			'**/*.md',
 			'**/*.html',
+			'.next/**/*',
 			'tailwind.config.cjs',
 			'postcss.config.js',
-			'next.config.mjs'
+			'next.config.mjs',
+			'.prettierrc.js'
 		]
 	},
 
