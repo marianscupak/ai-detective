@@ -1,5 +1,11 @@
 import { relations, sql } from 'drizzle-orm';
-import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
+import {
+	sqliteTable,
+	text,
+	integer,
+	index,
+	real
+} from 'drizzle-orm/sqlite-core';
 
 import { user } from './auth-schema';
 
@@ -130,6 +136,9 @@ export const chatMessage = sqliteTable(
 		// 'player' | 'gameMaster'
 		role: text('role').notNull(),
 		content: text('content').notNull(),
+
+		relevance: real('relevance'),
+		progress: real('progress'),
 
 		createdAt: integer('created_at', { mode: 'timestamp_ms' })
 			.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)

@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 /**
  * Represents the status of a user's playthrough of a single case.
  */
@@ -50,4 +52,17 @@ export type ChatMessage = {
 
 	/** The date and time when the message was created. */
 	createdAt: Date;
+
+	relevance?: number | null;
+
+	progress?: number | null;
 };
+
+export const aiResponseSchema = z.object({
+	narrativeResponse: z.string(),
+	relevance: z.number(),
+	progress: z.number(),
+	reasoning: z.string()
+});
+
+export type AiResponse = z.infer<typeof aiResponseSchema>;

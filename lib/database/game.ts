@@ -175,6 +175,8 @@ export const saveNewMessage = async (
 		gameSessionId: message.gameSessionId,
 		role: message.role,
 		content: message.content,
+		progress: message.progress,
+		relevance: message.relevance,
 		createdAt: now
 	});
 
@@ -183,6 +185,8 @@ export const saveNewMessage = async (
 		gameSessionId: message.gameSessionId,
 		role: message.role,
 		content: message.content,
+		progress: message.progress,
+		relevance: message.relevance,
 		createdAt: now
 	};
 };
