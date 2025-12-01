@@ -6,7 +6,9 @@ import {
 	useRef,
 	useState,
 	useTransition,
-	type FormEvent
+	type FormEvent,
+	type PropsWithChildren,
+	useCallback
 } from 'react';
 
 import { cn } from '@/lib/utils';
@@ -24,7 +26,8 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { type DetectiveCase } from '@/types/case';
 import { type ChatMessage, type GameSession } from '@/types/game';
-import { sendChatMessage } from '@/lib/actions/game';
+import { sendChatMessage } from '@/server-actions/game';
+import { MessageLoading } from '@/components/chat/message-loading';
 
 type ChatRoomProps = {
 	initialCaseDetails: DetectiveCase;
@@ -96,7 +99,7 @@ export const ChatRoom = ({
 	};
 
 	return (
-		<Card className="mx-auto flex h-[90vh] w-full max-w-3xl flex-col">
+		<Card className="mx-auto flex h-[95%] w-full max-w-3xl flex-col">
 			<CardHeader>
 				<CardTitle>{initialCaseDetails.title}</CardTitle>
 				<CardDescription>{initialCaseDetails.setting.location}</CardDescription>
@@ -108,6 +111,7 @@ export const ChatRoom = ({
 						{messages.map(message => (
 							<ChatMessageBubble key={message.id} message={message} />
 						))}
+						{isPending && <AiMessageLoadingBubble />}
 						<div ref={bottomRef} />
 					</div>
 				</ScrollArea>
@@ -139,8 +143,26 @@ export const ChatRoom = ({
 	);
 };
 
-const ChatMessageBubble = ({ message }: { message: ChatMessage }) => {
+export const ChatMessageBubble = ({
+	message
+}: {
+	message: ChatMessage | (Pick<ChatMessage, 'role'> & { loading: true });
+}) => {
 	const isPlayer = message.role === 'player';
+
+	const MessageContentWrapper = useCallback(
+		({ children }: PropsWithChildren) => (
+			<div
+				className={cn(
+					'max-w-sm rounded-lg px-4 py-2 text-sm',
+					isPlayer ? 'bg-primary text-primary-foreground' : 'bg-muted'
+				)}
+			>
+				{children}
+			</div>
+		),
+		[isPlayer]
+	);
 
 	return (
 		<div
@@ -155,14 +177,15 @@ const ChatMessageBubble = ({ message }: { message: ChatMessage }) => {
 				</Avatar>
 			)}
 
-			<div
-				className={cn(
-					'max-w-sm rounded-lg px-4 py-2 text-sm',
-					isPlayer ? 'bg-primary text-primary-foreground' : 'bg-muted'
-				)}
-			>
-				<p className="whitespace-pre-wrap">{message.content}</p>
-			</div>
+			{'loading' in message ? (
+				<MessageContentWrapper>
+					<MessageLoading />
+				</MessageContentWrapper>
+			) : (
+				<MessageContentWrapper>
+					<p className="whitespace-pre-wrap">{message.content}</p>
+				</MessageContentWrapper>
+			)}
 
 			{isPlayer && (
 				<Avatar className="h-8 w-8">
@@ -170,5 +193,13 @@ const ChatMessageBubble = ({ message }: { message: ChatMessage }) => {
 				</Avatar>
 			)}
 		</div>
+	);
+};
+
+const AiMessageLoadingBubble = () => {
+	return (
+		<ChatMessageBubble
+			message={{ role: 'gameMaster', loading: true } as const}
+		/>
 	);
 };

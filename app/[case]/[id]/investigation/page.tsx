@@ -1,5 +1,5 @@
 import { ChatRoom } from '@/components/chat/chat-room';
-import { loadGameSession } from '@/lib/actions/game';
+import { loadGameSession } from '@/server-actions/game';
 
 const InvestigationPage = async () => {
 	const caseDetails = await loadGameSession('case-orient-express-01');
