@@ -1,49 +1,75 @@
+// ============================================================================
+//  SUB-TYPES: These define the building blocks of our case.
+// ============================================================================
+
 /**
- * Represents a single character involved in the detective case.
+ * Represents a single character in the story, including suspects and the player.
  */
 export type Character = {
-	id: string; // A unique identifier, e.g., 'character-a'
-	name: string; // Full name of the character, e.g., "Mr. Abraham Adams"
-	description: string; // A brief description for context, e.g., "The quiet bartender with a hidden past."
+	id: string; // Unique ID to internally reference this character (e.g., 'char-julian').
+	name: string; // The character's full name (e.g., "Julian Croft").
+	description: string; // A brief on their personality, appearance, and connection to the case.
 };
 
 /**
- * Represents the environment and time of the case.
+ * Represents the victim (if a person) or the target of the crime (if an object).
  */
-export type CaseSetting = {
-	location: string; // A descriptive location, e.g., "The Salty Siren, a dimly lit pub in downtown New York"
-	dateTime: string; // ISO 8601 date-time string for when the main event occurs, e.g., "2025-11-08T21:00:00Z"
-	ambiance?: string; // Optional description for atmosphere, useful for generating ambiance or imagery, e.g., "A rainy night, the sound of a distant saxophone"
+export type VictimOrTarget = {
+	name: string; // Name of the person or item (e.g., "Arthur Blackwood", "The Serpent's Eye Diamond").
+	description: string; // Details about who they were or what it is.
 };
 
 /**
- * Represents a key event or clue that players can uncover.
+ * Represents a single piece of evidence that can be discovered.
  */
-export type KeyEvent = {
-	id: string; // A unique identifier for the event
-	description: string; // Detailed description of the event or clue, e.g., "Mr. A entered the pub and ordered a whiskey, looking nervous."
-	isCrucial: boolean; // Marks if this event is critical for solving the case.
+export type Evidence = {
+	id: string; // Unique ID for the evidence (e.g., 'evidence-ink-stain').
+	description: string; // What the evidence is (player-facing). E.g., "A faded letter", "A muddy bootprint".
+	location: string; // Where or how the evidence is found (player-facing). E.g., "Under the victim's bed", "Eleanor Vance mentions it during questioning".
+	significance: string; // The TRUE meaning of the evidence (AI-only). This is the secret the AI uses to evaluate the player's progress.
 };
 
 /**
- * The main type representing a complete detective case.
- * This object contains all information needed to run a game session.
+ * Contains the secret solution to the mystery, structured for the AI.
  */
-export type Case = {
-	// --- Core Metadata ---
-	id: string; // Unique identifier for the case (e.g., a UUID). Essential for database lookups.
-	title: string; // The public title of the case, e.g., "The Case of the Salty Siren".
-	authorId: string; // The ID of the user who created the case.
-	summary: string; // A short, engaging summary displayed in the story library.
-	createdAt: string; // ISO 8601 date-time string for when the case was created.
-	updatedAt: string; // ISO 8601 date-time string for the last update.
+export type Solution = {
+	culpritCharacterId: string; // The 'id' of the character who is the culprit.
+	motive: string; // The reason WHY they committed the crime.
+	method: string; // HOW they committed the crime.
+};
 
-	// --- Story & Gameplay Content ---
-	backstory: string; // The initial narrative presented to the player to set the scene.
-	setting: CaseSetting; // Structured information about the case's environment.
-	characters: Character[]; // An array of characters involved in the story.
-	keyEvents: KeyEvent[]; // An array of key events or clues that form the backbone of the investigation.
+// ============================================================================
+//  MAIN TYPE: The complete structure for a single detective case.
+// ============================================================================
 
-	// --- The Solution ---
-	resolution: string; // The detailed "secret" solution to the mystery. This is the ground truth the AI uses to guide the player.
+export type DetectiveCase = {
+	// --- Administrative Metadata (Auto-generated or system-set) ---
+	id: string;
+	authorId: string;
+	createdAt: string;
+
+	// --- Case Overview (Filled by user, can be AI-assisted) ---
+	title: string; // "Název"
+	theme: string; // "Téma" - e.g., "Noir", "Cozy Mystery", "Sci-Fi Crime".
+	summary: string; // "Popisek" - A short, engaging summary for the case selection screen.
+
+	// --- Core Narrative Setup ---
+	setting: {
+		location: string; // "místo" - e.g., "An express train to Prague".
+		dateTime: string; // "čas" - ISO 8601 format is best: "1945-05-19T20:45:00Z".
+		incident: string; // "Co se stalo" - The central crime. E.g., "A priceless diamond has been stolen from its secure case."
+	};
+
+	characters: {
+		player: Character; // "Kdo je hráč"
+		victimOrTarget: VictimOrTarget; // "Poškozenej / poškozená věc"
+		suspects: Character[]; // "Kdo vše v příběhu je"
+	};
+
+	// --- Gameplay and Solution Logic ---
+	evidence: Evidence[]; // "Důkazy"
+	solution: Solution; // "kdo to udělal" + motive and method
+
+	// --- Optional Context ---
+	notesForAI?: string; // "Optional pole" - A place for the author to give the AI extra instructions or context.
 };

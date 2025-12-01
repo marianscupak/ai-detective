@@ -1,7 +1,13 @@
 'use client';
 
 import { SendHorizontal } from 'lucide-react';
-import { type FormEvent, useEffect, useRef, useState } from 'react';
+import {
+	useEffect,
+	useRef,
+	useState,
+	useTransition,
+	type FormEvent
+} from 'react';
 
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -16,80 +22,93 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { type Case } from '@/types/case';
-
-import { type ChatMessage } from './types';
+import { type DetectiveCase } from '@/types/case';
+import { type ChatMessage, type GameSession } from '@/types/game';
+import { sendChatMessage } from '@/lib/actions/game';
 
 type ChatRoomProps = {
-	caseDetails: Case;
+	initialCaseDetails: DetectiveCase;
+	initialGameSession: GameSession;
+	initialMessages: ChatMessage[];
 };
 
-export const ChatRoom = ({ caseDetails }: ChatRoomProps) => {
-	// State for managing the list of messages
-	const [messages, setMessages] = useState<ChatMessage[]>([
-		{
-			id: 'init',
-			role: 'gameMaster',
-			content: caseDetails.backstory
-		}
-	]);
-
-	// State for the user's current input
+export const ChatRoom = ({
+	initialCaseDetails,
+	initialGameSession,
+	initialMessages
+}: ChatRoomProps) => {
+	const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
 	const [input, setInput] = useState('');
+	const [isPending, startTransition] = useTransition();
+	const inputRef = useRef<HTMLInputElement | null>(null);
 
-	// Ref for the scroll area to automatically scroll down
-	const scrollAreaRef = useRef<HTMLDivElement>(null);
+	useEffect(() => {
+		if (!isPending) {
+			inputRef.current?.focus();
+		}
+	}, [isPending]);
 
-	// Function to handle sending a message
-	const handleSendMessage = (e: FormEvent) => {
+	const bottomRef = useRef<HTMLDivElement | null>(null);
+
+	useEffect(() => {
+		bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+	}, [messages.length]);
+
+	const handleSendMessage = async (e: FormEvent) => {
 		e.preventDefault();
-		if (input.trim() === '') return;
+		if (!input.trim() || isPending) return;
 
-		const newPlayerMessage: ChatMessage = {
-			id: `player-${Date.now()}`,
-			role: 'player',
-			content: input
-		};
-
-		setMessages(prev => [...prev, newPlayerMessage]);
+		const content = input;
 		setInput('');
 
-		// --- AI Response Simulation ---
-		// In a real app, you would make an API call here.
-		// We'll simulate a delayed response.
-		setTimeout(() => {
-			const aiResponse: ChatMessage = {
-				id: `gm-${Date.now()}`,
-				role: 'gameMaster',
-				content: "That's an interesting theory. What makes you say that?"
-			};
-			setMessages(prev => [...prev, aiResponse]);
-		}, 1200);
-	};
+		setMessages(prev => [
+			...prev,
+			{
+				id: `temp-${Date.now()}`,
+				role: 'player',
+				content,
+				gameSessionId: initialGameSession.id,
+				createdAt: new Date()
+			}
+		]);
 
-	// Effect to scroll to the bottom whenever messages change
-	useEffect(() => {
-		if (scrollAreaRef.current) {
-			scrollAreaRef.current.scrollTo({
-				top: scrollAreaRef.current.scrollHeight,
-				behavior: 'smooth'
-			});
-		}
-	}, [messages]);
+		startTransition(async () => {
+			try {
+				const aiMessage = await sendChatMessage(
+					initialCaseDetails.id,
+					initialGameSession.id,
+					content
+				);
+				setMessages(prev => [...prev, aiMessage]);
+			} catch {
+				setMessages(prev => [
+					...prev,
+					{
+						id: `err-${Date.now()}`,
+						role: 'gameMaster',
+						content: 'An error occurred. Please try again.',
+						gameSessionId: initialGameSession.id,
+						createdAt: new Date()
+					}
+				]);
+			}
+		});
+	};
 
 	return (
 		<Card className="mx-auto flex h-[90vh] w-full max-w-3xl flex-col">
 			<CardHeader>
-				<CardTitle>{caseDetails.title}</CardTitle>
-				<CardDescription>{caseDetails.setting.location}</CardDescription>
+				<CardTitle>{initialCaseDetails.title}</CardTitle>
+				<CardDescription>{initialCaseDetails.setting.location}</CardDescription>
 			</CardHeader>
 
-			<CardContent className="flex-grow overflow-hidden">
-				<ScrollArea className="h-full pr-4" ref={scrollAreaRef}>
-					<div className="space-y-6">
+			<CardContent className="flex-1 overflow-hidden">
+				<ScrollArea className="h-full pr-4">
+					<div className="flex h-full flex-col space-y-6">
 						{messages.map(message => (
 							<ChatMessageBubble key={message.id} message={message} />
 						))}
+						<div ref={bottomRef} />
 					</div>
 				</ScrollArea>
 			</CardContent>
@@ -100,14 +119,17 @@ export const ChatRoom = ({ caseDetails }: ChatRoomProps) => {
 					className="flex w-full items-center space-x-2"
 				>
 					<Input
-						id="message"
-						placeholder="Type your theory..."
+						ref={inputRef}
+						placeholder={
+							isPending ? 'The AI is thinking…' : 'Type your theory…'
+						}
 						className="flex-1"
 						autoComplete="off"
 						value={input}
 						onChange={e => setInput(e.target.value)}
+						disabled={isPending}
 					/>
-					<Button type="submit" size="icon">
+					<Button type="submit" size="icon" disabled={isPending}>
 						<SendHorizontal className="h-4 w-4" />
 						<span className="sr-only">Send</span>
 					</Button>
@@ -117,7 +139,6 @@ export const ChatRoom = ({ caseDetails }: ChatRoomProps) => {
 	);
 };
 
-// Sub-component for rendering a single message bubble
 const ChatMessageBubble = ({ message }: { message: ChatMessage }) => {
 	const isPlayer = message.role === 'player';
 
@@ -133,14 +154,16 @@ const ChatMessageBubble = ({ message }: { message: ChatMessage }) => {
 					<AvatarFallback>GM</AvatarFallback>
 				</Avatar>
 			)}
+
 			<div
 				className={cn(
 					'max-w-sm rounded-lg px-4 py-2 text-sm',
 					isPlayer ? 'bg-primary text-primary-foreground' : 'bg-muted'
 				)}
 			>
-				<p style={{ whiteSpace: 'pre-wrap' }}>{message.content}</p>
+				<p className="whitespace-pre-wrap">{message.content}</p>
 			</div>
+
 			{isPlayer && (
 				<Avatar className="h-8 w-8">
 					<AvatarFallback>YOU</AvatarFallback>
