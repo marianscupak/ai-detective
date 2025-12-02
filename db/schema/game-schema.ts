@@ -97,7 +97,6 @@ export const gameSession = sqliteTable(
 			.notNull()
 			.references(() => detectiveCase.id, { onDelete: 'cascade' }),
 
-		// 'in-progress' | 'completed'
 		status: text('status').notNull(),
 		progress: real('progress'),
 

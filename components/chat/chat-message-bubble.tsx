@@ -1,11 +1,14 @@
 import { type PropsWithChildren } from 'react';
-import { Tooltip } from '@radix-ui/react-tooltip';
 
 import type { ChatMessage } from '@/types/game';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { MessageLoading } from '@/components/chat/message-loading';
-import { TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger
+} from '@/components/ui/tooltip';
 
 const MessageContentWrapper = ({
 	children,
@@ -45,8 +48,6 @@ export const ChatMessageBubble = ({
 	};
 
 	const canShowTooltip = isGameFinished && !!reasoningForPlayer;
-
-	console.log({ isGameFinished, reasoningForPlayer, message });
 
 	const PlayerMessageContent = () => (
 		<div className="flex flex-col items-end gap-1">

@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * Represents the status of a user's playthrough of a single case.
  */
-export type GameStatus = 'in-progress' | 'completed';
+export type GameStatus = 'in-progress' | 'completed' | 'abandoned';
 
 /**
  * Represents a single user's attempt at solving a case. This object tracks the

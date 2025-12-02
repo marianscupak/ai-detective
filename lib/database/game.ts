@@ -1,7 +1,11 @@
 import { and, asc, eq, or } from 'drizzle-orm';
 
 import { type DetectiveCase } from '@/types/case';
-import { type ChatMessage, type GameSession } from '@/types/game';
+import {
+	type ChatMessage,
+	type GameSession,
+	type GameStatus
+} from '@/types/game';
 import { db } from '@/db';
 import {
 	detectiveCase,
@@ -151,11 +155,11 @@ export const findOrCreateGameSession = async (
 
 export const updateGameSessionStatus = async (
 	gameSessionId: string,
-	status: 'completed' | 'in-progress'
+	status: GameStatus
 ): Promise<void> => {
 	await db
 		.update(gameSession)
-		.set({ status, updatedAt: new Date() })
+		.set({ status })
 		.where(eq(gameSession.id, gameSessionId));
 };
 
@@ -165,7 +169,7 @@ export const updateGameSessionProgress = async (
 ): Promise<void> => {
 	await db
 		.update(gameSession)
-		.set({ progress, updatedAt: new Date() })
+		.set({ progress })
 		.where(eq(gameSession.id, gameSessionId));
 };
 

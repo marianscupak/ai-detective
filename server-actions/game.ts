@@ -233,8 +233,6 @@ export const sendChatMessage = async (
 
 		const parsedData = aiResponseSchema.parse(data);
 
-		console.log(parsedData.reasoning);
-
 		const savedMessage = await saveNewMessage({
 			gameSessionId,
 			role: 'gameMaster',
@@ -308,4 +306,25 @@ export const getGameSessionStatus = async (gameSessionId: string) => {
 		status: gameSession.status,
 		progress: gameSession.progress ?? 0
 	};
+};
+
+export const abandonGameSession = async (gameSessionId: string) => {
+	const session = await auth.api.getSession({
+		headers: await headers()
+	});
+
+	if (!session?.user?.id) {
+		throw new Error(
+			'Unauthorized: You must be logged in to perform this action.'
+		);
+	}
+
+	try {
+		await updateGameSessionStatus(gameSessionId, 'abandoned');
+
+		return { success: true };
+	} catch (error) {
+		console.error('Failed to abandon game session:', error);
+		throw new Error('Could not abandon the session. Please try again.');
+	}
 };
