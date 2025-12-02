@@ -160,7 +160,9 @@ export const getChatHistory = async (
 		gameSessionId: row.gameSessionId,
 		role: row.role as ChatMessage['role'],
 		content: row.content,
-		createdAt: new Date(row.createdAt)
+		createdAt: new Date(row.createdAt),
+		progress: row.progress,
+		relevance: row.relevance
 	}));
 };
 
@@ -175,6 +177,8 @@ export const saveNewMessage = async (
 		gameSessionId: message.gameSessionId,
 		role: message.role,
 		content: message.content,
+		progress: message.progress,
+		relevance: message.relevance,
 		createdAt: now
 	});
 
@@ -183,6 +187,8 @@ export const saveNewMessage = async (
 		gameSessionId: message.gameSessionId,
 		role: message.role,
 		content: message.content,
+		progress: message.progress,
+		relevance: message.relevance,
 		createdAt: now
 	};
 };

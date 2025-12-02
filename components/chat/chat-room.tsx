@@ -6,13 +6,9 @@ import {
 	useRef,
 	useState,
 	useTransition,
-	type FormEvent,
-	type PropsWithChildren,
-	useCallback
+	type FormEvent
 } from 'react';
 
-import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
 	Card,
@@ -27,7 +23,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { type DetectiveCase } from '@/types/case';
 import { type ChatMessage, type GameSession } from '@/types/game';
 import { sendChatMessage } from '@/server-actions/game';
-import { MessageLoading } from '@/components/chat/message-loading';
+import { ChatMessageBubble } from '@/components/chat/chat-message-bubble';
+import { AiMessageLoadingBubble } from '@/components/chat/ai-message-loading-bubble';
 
 type ChatRoomProps = {
 	initialCaseDetails: DetectiveCase;
@@ -44,6 +41,16 @@ export const ChatRoom = ({
 	const [input, setInput] = useState('');
 	const [isPending, startTransition] = useTransition();
 	const inputRef = useRef<HTMLInputElement | null>(null);
+
+	const currentProgress =
+		messages
+			.toReversed()
+			.find(
+				m =>
+					m.role === 'gameMaster' &&
+					m.progress !== null &&
+					m.progress !== undefined
+			)?.progress ?? 0;
 
 	useEffect(() => {
 		if (!isPending) {
@@ -103,14 +110,44 @@ export const ChatRoom = ({
 			<CardHeader>
 				<CardTitle>{initialCaseDetails.title}</CardTitle>
 				<CardDescription>{initialCaseDetails.setting.location}</CardDescription>
+
+				<div className="mt-4 flex flex-col gap-2">
+					<div className="text-muted-foreground flex justify-between text-xs">
+						<span>Case progress</span>
+						<span>{Math.round(currentProgress * 100)}%</span>
+					</div>
+					<div className="bg-muted h-2 w-full overflow-hidden rounded-full">
+						<div
+							className="bg-primary h-full rounded-full transition-all"
+							style={{ width: `${currentProgress * 100}%` }}
+						/>
+					</div>
+				</div>
 			</CardHeader>
 
 			<CardContent className="flex-1 overflow-hidden">
 				<ScrollArea className="h-full pr-4">
 					<div className="flex h-full flex-col space-y-6">
-						{messages.map(message => (
-							<ChatMessageBubble key={message.id} message={message} />
-						))}
+						{messages.map((message, index) => {
+							const next = messages[index + 1];
+
+							const relevanceForPlayer =
+								message.role === 'player' &&
+								next?.role === 'gameMaster' &&
+								'relevance' in next &&
+								typeof next.relevance === 'number'
+									? next.relevance
+									: undefined;
+
+							return (
+								<ChatMessageBubble
+									key={message.id}
+									message={message}
+									relevanceForPlayer={relevanceForPlayer}
+								/>
+							);
+						})}
+
 						{isPending && <AiMessageLoadingBubble />}
 						<div ref={bottomRef} />
 					</div>
@@ -140,66 +177,5 @@ export const ChatRoom = ({
 				</form>
 			</CardFooter>
 		</Card>
-	);
-};
-
-export const ChatMessageBubble = ({
-	message
-}: {
-	message: ChatMessage | (Pick<ChatMessage, 'role'> & { loading: true });
-}) => {
-	const isPlayer = message.role === 'player';
-
-	const MessageContentWrapper = useCallback(
-		({ children }: PropsWithChildren) => (
-			<div
-				className={cn(
-					'max-w-sm rounded-lg px-4 py-2 text-sm',
-					isPlayer ? 'bg-primary text-primary-foreground' : 'bg-muted'
-				)}
-			>
-				{children}
-			</div>
-		),
-		[isPlayer]
-	);
-
-	return (
-		<div
-			className={cn(
-				'flex items-start gap-3',
-				isPlayer ? 'justify-end' : 'justify-start'
-			)}
-		>
-			{!isPlayer && (
-				<Avatar className="h-8 w-8">
-					<AvatarFallback>GM</AvatarFallback>
-				</Avatar>
-			)}
-
-			{'loading' in message ? (
-				<MessageContentWrapper>
-					<MessageLoading />
-				</MessageContentWrapper>
-			) : (
-				<MessageContentWrapper>
-					<p className="whitespace-pre-wrap">{message.content}</p>
-				</MessageContentWrapper>
-			)}
-
-			{isPlayer && (
-				<Avatar className="h-8 w-8">
-					<AvatarFallback>YOU</AvatarFallback>
-				</Avatar>
-			)}
-		</div>
-	);
-};
-
-const AiMessageLoadingBubble = () => {
-	return (
-		<ChatMessageBubble
-			message={{ role: 'gameMaster', loading: true } as const}
-		/>
 	);
 };
