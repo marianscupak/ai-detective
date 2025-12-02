@@ -206,7 +206,8 @@ export const getChatHistory = async (
 		role: row.role as ChatMessage['role'],
 		content: row.content,
 		createdAt: new Date(row.createdAt),
-		relevance: row.relevance
+		relevance: row.relevance,
+		reasoning: row.reasoning
 	}));
 };
 

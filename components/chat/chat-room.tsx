@@ -27,6 +27,7 @@ import { getGameSessionStatus, sendChatMessage } from '@/server-actions/game';
 import { ChatMessageBubble } from '@/components/chat/chat-message-bubble';
 import { AiMessageLoadingBubble } from '@/components/chat/ai-message-loading-bubble';
 import { GameConclusion } from '@/components/chat/game-conclusion';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 type ChatRoomProps = {
 	initialCaseDetails: DetectiveCase;
@@ -138,30 +139,40 @@ export const ChatRoom = ({
 
 			<CardContent className="flex-1 overflow-hidden">
 				<ScrollArea className="h-full pr-4">
-					<div className="flex h-full flex-col space-y-6">
-						{messages.map((message, index) => {
-							const next = messages[index + 1];
+					<TooltipProvider delayDuration={200}>
+						<div className="flex h-full flex-col space-y-6">
+							{messages.map((message, index) => {
+								const next = messages[index + 1];
 
-							const relevanceForPlayer =
-								message.role === 'player' &&
-								next?.role === 'gameMaster' &&
-								'relevance' in next &&
-								typeof next.relevance === 'number'
-									? next.relevance
-									: undefined;
+								const relevanceForPlayer =
+									message.role === 'player' &&
+									next?.role === 'gameMaster' &&
+									typeof next.relevance === 'number'
+										? next.relevance
+										: undefined;
 
-							return (
-								<ChatMessageBubble
-									key={message.id}
-									message={message}
-									relevanceForPlayer={relevanceForPlayer}
-								/>
-							);
-						})}
+								const relevanceReasoningForPlayer =
+									message.role === 'player' &&
+									next?.role === 'gameMaster' &&
+									typeof next.reasoning === 'string'
+										? next.reasoning
+										: undefined;
 
-						{isPending && <AiMessageLoadingBubble />}
-						<div ref={bottomRef} />
-					</div>
+								return (
+									<ChatMessageBubble
+										key={message.id}
+										message={message}
+										relevanceForPlayer={relevanceForPlayer}
+										reasoningForPlayer={relevanceReasoningForPlayer}
+										isGameFinished={isGameFinished}
+									/>
+								);
+							})}
+
+							{isPending && <AiMessageLoadingBubble />}
+							<div ref={bottomRef} />
+						</div>
+					</TooltipProvider>
 				</ScrollArea>
 			</CardContent>
 
