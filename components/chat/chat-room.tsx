@@ -26,6 +26,7 @@ import { type ChatMessage, type GameSession } from '@/types/game';
 import { getGameSessionStatus, sendChatMessage } from '@/server-actions/game';
 import { ChatMessageBubble } from '@/components/chat/chat-message-bubble';
 import { AiMessageLoadingBubble } from '@/components/chat/ai-message-loading-bubble';
+import { GameConclusion } from '@/components/chat/game-conclusion';
 
 type ChatRoomProps = {
 	initialCaseDetails: DetectiveCase;
@@ -43,15 +44,19 @@ export const ChatRoom = ({
 	const [isPending, startTransition] = useTransition();
 	const inputRef = useRef<HTMLInputElement | null>(null);
 
+	const [isGameFinished, setIsGameFinished] = useState(
+		initialGameSession.status === 'completed'
+	);
+
 	const [currentProgress, setCurrentProgress] = useState(
 		initialGameSession.progress ?? 0
 	);
 
 	useEffect(() => {
-		if (!isPending) {
+		if (!isPending && !isGameFinished) {
 			inputRef.current?.focus();
 		}
-	}, [isPending]);
+	}, [isPending, isGameFinished]);
 
 	const bottomRef = useRef<HTMLDivElement | null>(null);
 
@@ -62,6 +67,10 @@ export const ChatRoom = ({
 	const reloadProgress = useCallback(async () => {
 		const gameSession = await getGameSessionStatus(initialGameSession.id);
 		setCurrentProgress(gameSession.progress ?? 0);
+
+		if (gameSession.status === 'completed') {
+			setIsGameFinished(true);
+		}
 	}, [initialGameSession.id]);
 
 	const handleSendMessage = async (e: FormEvent) => {
@@ -157,26 +166,30 @@ export const ChatRoom = ({
 			</CardContent>
 
 			<CardFooter>
-				<form
-					onSubmit={handleSendMessage}
-					className="flex w-full items-center space-x-2"
-				>
-					<Input
-						ref={inputRef}
-						placeholder={
-							isPending ? 'The game master is thinking…' : 'Type your theory…'
-						}
-						className="flex-1"
-						autoComplete="off"
-						value={input}
-						onChange={e => setInput(e.target.value)}
-						disabled={isPending}
-					/>
-					<Button type="submit" size="icon" disabled={isPending}>
-						<SendHorizontal className="h-4 w-4" />
-						<span className="sr-only">Send</span>
-					</Button>
-				</form>
+				{isGameFinished ? (
+					<GameConclusion />
+				) : (
+					<form
+						onSubmit={handleSendMessage}
+						className="flex w-full items-center space-x-2"
+					>
+						<Input
+							ref={inputRef}
+							placeholder={
+								isPending ? 'The game master is thinking…' : 'Type your theory…'
+							}
+							className="flex-1"
+							autoComplete="off"
+							value={input}
+							onChange={e => setInput(e.target.value)}
+							disabled={isPending}
+						/>
+						<Button type="submit" size="icon" disabled={isPending}>
+							<SendHorizontal className="h-4 w-4" />
+							<span className="sr-only">Send</span>
+						</Button>
+					</form>
+				)}
 			</CardFooter>
 		</Card>
 	);

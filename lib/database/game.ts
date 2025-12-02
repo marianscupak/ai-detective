@@ -1,4 +1,4 @@
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, eq, or } from 'drizzle-orm';
 
 import { type DetectiveCase } from '@/types/case';
 import { type ChatMessage, type GameSession } from '@/types/game';
@@ -106,7 +106,10 @@ export const findOrCreateGameSession = async (
 			and(
 				eq(gameSession.userId, userId),
 				eq(gameSession.caseId, caseId),
-				eq(gameSession.status, 'in-progress')
+				or(
+					eq(gameSession.status, 'completed'),
+					eq(gameSession.status, 'in-progress')
+				)
 			)
 		)
 		.limit(1);

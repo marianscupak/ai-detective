@@ -158,6 +158,7 @@ HOW TO CALCULATE SCORES:
    - It should only ever increase or stay the same across the whole game.
    - The previous progress value up to this point is: ${previousProgress}.
    - Your new "progress" MUST be greater than or equal to ${previousProgress}.
+   - The progress score MUST NEVER be equal to 1.0 unless the player has solved the case and you set \`isSolved: true\` in your response.
    - 0.0: The game has just started.
    - 0.25: Player has gathered some initial clues.
    - 0.50: Player has identified a key piece of evidence and is questioning the right people.
