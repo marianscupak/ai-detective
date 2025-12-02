@@ -160,7 +160,9 @@ export const getChatHistory = async (
 		gameSessionId: row.gameSessionId,
 		role: row.role as ChatMessage['role'],
 		content: row.content,
-		createdAt: new Date(row.createdAt)
+		createdAt: new Date(row.createdAt),
+		progress: row.progress,
+		relevance: row.relevance
 	}));
 };
 

@@ -6,13 +6,9 @@ import {
 	useRef,
 	useState,
 	useTransition,
-	type FormEvent,
-	type PropsWithChildren,
-	useCallback
+	type FormEvent
 } from 'react';
 
-import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
 	Card,
@@ -27,7 +23,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { type DetectiveCase } from '@/types/case';
 import { type ChatMessage, type GameSession } from '@/types/game';
 import { sendChatMessage } from '@/server-actions/game';
-import { MessageLoading } from '@/components/chat/message-loading';
+import { ChatMessageBubble } from '@/components/chat/chat-message-bubble';
+import { AiMessageLoadingBubble } from '@/components/chat/ai-message-loading-bubble';
 
 type ChatRoomProps = {
 	initialCaseDetails: DetectiveCase;
@@ -46,8 +43,8 @@ export const ChatRoom = ({
 	const inputRef = useRef<HTMLInputElement | null>(null);
 
 	const currentProgress =
-		[...messages]
-			.reverse()
+		messages
+			.toReversed()
 			.find(
 				m =>
 					m.role === 'gameMaster' &&
@@ -180,90 +177,5 @@ export const ChatRoom = ({
 				</form>
 			</CardFooter>
 		</Card>
-	);
-};
-
-export const ChatMessageBubble = ({
-	message,
-	relevanceForPlayer
-}: {
-	message: ChatMessage | (Pick<ChatMessage, 'role'> & { loading: true });
-	relevanceForPlayer?: number;
-}) => {
-	const isPlayer = message.role === 'player';
-
-	const MessageContentWrapper = useCallback(
-		({ children }: PropsWithChildren) => (
-			<div
-				className={cn(
-					'max-w-sm rounded-lg px-4 py-2 text-sm',
-					isPlayer ? 'bg-primary text-primary-foreground' : 'bg-muted'
-				)}
-			>
-				{children}
-			</div>
-		),
-		[isPlayer]
-	);
-
-	const relevanceLabel = (r: number) => {
-		if (r >= 0.9) return 'Bullseye';
-		if (r >= 0.7) return 'Very close';
-		if (r >= 0.4) return 'On the trail';
-		if (r >= 0.1) return 'Off track';
-		return 'Way off';
-	};
-
-	return (
-		<div
-			className={cn(
-				'flex flex-col gap-1',
-				isPlayer ? 'items-end' : 'items-start'
-			)}
-		>
-			<div
-				className={cn(
-					'flex w-full items-start gap-3',
-					isPlayer ? 'justify-end' : 'justify-start'
-				)}
-			>
-				{!isPlayer && (
-					<Avatar className="h-8 w-8">
-						<AvatarFallback>GM</AvatarFallback>
-					</Avatar>
-				)}
-
-				{'loading' in message ? (
-					<MessageContentWrapper>
-						<MessageLoading />
-					</MessageContentWrapper>
-				) : (
-					<MessageContentWrapper>
-						<p className="whitespace-pre-wrap">{message.content}</p>
-					</MessageContentWrapper>
-				)}
-
-				{isPlayer && (
-					<Avatar className="h-8 w-8">
-						<AvatarFallback>YOU</AvatarFallback>
-					</Avatar>
-				)}
-			</div>
-
-			{isPlayer && relevanceForPlayer && (
-				<span className="text-muted-foreground text-[10px]">
-					{relevanceLabel(relevanceForPlayer)} (
-					{Math.round(relevanceForPlayer * 100)}%)
-				</span>
-			)}
-		</div>
-	);
-};
-
-const AiMessageLoadingBubble = () => {
-	return (
-		<ChatMessageBubble
-			message={{ role: 'gameMaster', loading: true } as const}
-		/>
 	);
 };
