@@ -97,8 +97,9 @@ export const gameSession = sqliteTable(
 			.notNull()
 			.references(() => detectiveCase.id, { onDelete: 'cascade' }),
 
-		// 'in-progress' | 'completed' | 'abandoned'
+		// 'in-progress' | 'completed'
 		status: text('status').notNull(),
+		progress: real('progress'),
 
 		startedAt: integer('started_at', { mode: 'timestamp_ms' })
 			.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
@@ -138,7 +139,7 @@ export const chatMessage = sqliteTable(
 		content: text('content').notNull(),
 
 		relevance: real('relevance'),
-		progress: real('progress'),
+		reasoning: text('reasoning'),
 
 		createdAt: integer('created_at', { mode: 'timestamp_ms' })
 			.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)

@@ -6,7 +6,10 @@ import {
 	getCaseById,
 	findOrCreateGameSession,
 	getChatHistory,
-	saveNewMessage
+	saveNewMessage,
+	updateGameSessionStatus,
+	updateGameSessionProgress,
+	getGameSessionById
 } from '@/lib/database/game';
 import { auth } from '@/lib/auth';
 import { type DetectiveCase } from '@/types/case';
@@ -132,7 +135,8 @@ The JSON must have ALL of these keys:
   "narrativeResponse": "Your in-character, narrative message to the player.",
   "relevance": 0.0,
   "progress": 0.0,
-  "reasoning": "Your brief, out-of-character reasoning for the scores."
+  "reasoning": "Your brief, out-of-character reasoning for the scores.",
+  "isSolved": true // OPTIONAL, set to true ONLY if the player's latest message is a DIRECT and CORRECT accusation.
 }
 
 - "narrativeResponse" must follow all GAME RULES above.
@@ -163,6 +167,15 @@ HOW TO CALCULATE SCORES:
 3) "reasoning":
    - Briefly explain your scoring and how the latest player message affects relevance and progress.
    - Example: "Player correctly identified the significance of the ink stain, which is a major breakthrough. Progress increases significantly."
+
+4) "isSolved":
+   - Set this to \`true\` ONLY if the player's latest message is a DIRECT and CORRECT accusation.
+	 - The accusation MUST correctly identify:
+        1. The Culprit (\`${culpritId}\`)
+        2. The Motive
+        3. The Method
+   - If the accusation is correct, your 'narrativeResponse' should be a confirmation, and you MUST set \`progress: 1.0\` and \`isSolved: true\`.
+   - If the accusation is incorrect or incomplete, DO NOT include this flag. But try to guide the player in the right direction.
 
 GAME DATA (PLAYER-FACING IF YOU CHOOSE TO REVEAL IT IN NARRATIVE FORM):
 ${publicInfo}
@@ -209,19 +222,9 @@ export const sendChatMessage = async (
 	}
 
 	const chatHistory = await getChatHistory(gameSessionId);
-	const lastGmMessage = [...chatHistory]
-		.reverse()
-		.find(
-			msg =>
-				msg.role === 'gameMaster' &&
-				msg.progress !== null &&
-				msg.progress !== undefined
-		);
-	const prompt = buildPrompt(
-		caseData,
-		chatHistory,
-		lastGmMessage?.progress ?? undefined
-	);
+	const gameSession = await getGameSessionById(gameSessionId);
+
+	const prompt = buildPrompt(caseData, chatHistory, gameSession?.progress ?? 0);
 	const result = await callGemini(prompt);
 
 	try {
@@ -229,15 +232,23 @@ export const sendChatMessage = async (
 
 		const parsedData = aiResponseSchema.parse(data);
 
-		console.log(parsedData);
+		console.log(parsedData.reasoning);
 
-		return await saveNewMessage({
+		const savedMessage = await saveNewMessage({
 			gameSessionId,
 			role: 'gameMaster',
 			content: parsedData.narrativeResponse,
-			progress: parsedData.progress,
-			relevance: parsedData.relevance
+			relevance: parsedData.relevance,
+			reasoning: parsedData.reasoning
 		});
+
+		await updateGameSessionProgress(gameSessionId, parsedData.progress);
+
+		if (parsedData.isSolved) {
+			await updateGameSessionStatus(gameSessionId, 'completed');
+		}
+
+		return savedMessage;
 	} catch (error) {
 		console.error('Error in sendChatMessage action:', error);
 		throw new Error('Failed to send message. Please try again.');
@@ -268,8 +279,7 @@ export const loadGameSession = async (caseId: string) => {
 			const initialMessage = await saveNewMessage({
 				gameSessionId: gameSession.id,
 				role: 'gameMaster',
-				content: caseDetails.summary,
-				progress: 0
+				content: caseDetails.summary
 			});
 
 			chatHistory.push(initialMessage);
@@ -284,4 +294,17 @@ export const loadGameSession = async (caseId: string) => {
 		console.error('Error in loadGameSession action:', error);
 		throw new Error('Failed to load game session. Please try again.');
 	}
+};
+
+export const getGameSessionStatus = async (gameSessionId: string) => {
+	const gameSession = await getGameSessionById(gameSessionId);
+
+	if (!gameSession) {
+		throw new Error('Game session not found.');
+	}
+
+	return {
+		status: gameSession.status,
+		progress: gameSession.progress ?? 0
+	};
 };

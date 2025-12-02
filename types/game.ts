@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * Represents the status of a user's playthrough of a single case.
  */
-export type GameStatus = 'in-progress' | 'solved' | 'abandoned';
+export type GameStatus = 'in-progress' | 'completed';
 
 /**
  * Represents a single user's attempt at solving a case. This object tracks the
@@ -27,6 +27,8 @@ export type GameSession = {
 
 	/** The date and time of the last interaction in this session. */
 	updatedAt: Date;
+
+	progress: number;
 };
 
 /**
@@ -55,14 +57,15 @@ export type ChatMessage = {
 
 	relevance?: number | null;
 
-	progress?: number | null;
+	reasoning?: string | null;
 };
 
 export const aiResponseSchema = z.object({
 	narrativeResponse: z.string(),
 	relevance: z.number(),
 	progress: z.number(),
-	reasoning: z.string()
+	reasoning: z.string(),
+	isSolved: z.boolean().optional()
 });
 
 export type AiResponse = z.infer<typeof aiResponseSchema>;

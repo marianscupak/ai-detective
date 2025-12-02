@@ -6,7 +6,8 @@ import {
 	useRef,
 	useState,
 	useTransition,
-	type FormEvent
+	type FormEvent,
+	useCallback
 } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -22,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { type DetectiveCase } from '@/types/case';
 import { type ChatMessage, type GameSession } from '@/types/game';
-import { sendChatMessage } from '@/server-actions/game';
+import { getGameSessionStatus, sendChatMessage } from '@/server-actions/game';
 import { ChatMessageBubble } from '@/components/chat/chat-message-bubble';
 import { AiMessageLoadingBubble } from '@/components/chat/ai-message-loading-bubble';
 
@@ -42,15 +43,9 @@ export const ChatRoom = ({
 	const [isPending, startTransition] = useTransition();
 	const inputRef = useRef<HTMLInputElement | null>(null);
 
-	const currentProgress =
-		messages
-			.toReversed()
-			.find(
-				m =>
-					m.role === 'gameMaster' &&
-					m.progress !== null &&
-					m.progress !== undefined
-			)?.progress ?? 0;
+	const [currentProgress, setCurrentProgress] = useState(
+		initialGameSession.progress ?? 0
+	);
 
 	useEffect(() => {
 		if (!isPending) {
@@ -63,6 +58,11 @@ export const ChatRoom = ({
 	useEffect(() => {
 		bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
 	}, [messages.length]);
+
+	const reloadProgress = useCallback(async () => {
+		const gameSession = await getGameSessionStatus(initialGameSession.id);
+		setCurrentProgress(gameSession.progress ?? 0);
+	}, [initialGameSession.id]);
 
 	const handleSendMessage = async (e: FormEvent) => {
 		e.preventDefault();
@@ -90,6 +90,8 @@ export const ChatRoom = ({
 					content
 				);
 				setMessages(prev => [...prev, aiMessage]);
+
+				await reloadProgress();
 			} catch {
 				setMessages(prev => [
 					...prev,
@@ -162,7 +164,7 @@ export const ChatRoom = ({
 					<Input
 						ref={inputRef}
 						placeholder={
-							isPending ? 'The AI is thinking…' : 'Type your theory…'
+							isPending ? 'The game master is thinking…' : 'Type your theory…'
 						}
 						className="flex-1"
 						autoComplete="off"
