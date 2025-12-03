@@ -10,23 +10,24 @@ import {
 } from '@/lib/database/game';
 import { auth } from '@/lib/auth';
 import { type DetectiveCase } from '@/types/case';
-import { type ChatMessage } from '@/types/game';
+import { aiResponseSchema, type ChatMessage } from '@/types/game';
 import { callGemini } from '@/lib/gemini';
-
-const MAX_HISTORY_MESSAGES = 40;
 
 const buildPrompt = (
 	caseData: DetectiveCase,
-	history: ChatMessage[]
+	history: ChatMessage[],
+	previousProgress = 0
 ): string => {
-	const trimmedHistory = history.slice(-MAX_HISTORY_MESSAGES);
-
-	const chatHistory = trimmedHistory
+	const chatHistory = history
 		.map(
 			msg =>
 				`${msg.role === 'player' ? 'Player' : 'Game Master'}: ${msg.content}`
 		)
 		.join('\n');
+
+	const lastPlayerMessage =
+		[...history].reverse().find(msg => msg.role === 'player')?.content ??
+		'(No player message yet.)';
 
 	const suspectsText = caseData.characters.suspects
 		.map(s => `- [${s.id}] ${s.name}: ${s.description}`)
@@ -102,8 +103,12 @@ ${authorNotes}
 	return `
 You are "The Game Master" in an interactive detective mystery game played in a chat.
 
-GAME RULES:
-- Stay strictly in character as the Game Master.
+Your job has TWO parts:
+1) Continue the story and respond to the player in character as the Game Master.
+2) Evaluate the player's latest message for relevance and overall progress in solving the case.
+
+GAME RULES FOR THE NARRATIVE:
+- Stay strictly in character in the "narrativeResponse" part of your answer.
 - Never reveal the secret solution, culprit, motives, methods, evidence significance, or your internal reasoning directly.
 - You may hint, foreshadow, and guide, but never state the culprit or method outright unless the game explicitly reaches a final reveal phase (which is not the case unless the player directly accuses with strong evidence and you decide it's time).
 - Respond with hints, questions, atmosphere, and narrative descriptions.
@@ -119,10 +124,50 @@ GAME RULES:
 - Do not mention that you are an AI or that you have access to "secret info", IDs, or internal data structures.
 - Never mention internal IDs like [${culpritId}] explicitly to the player.
 
+RESPONSE FORMAT (VERY IMPORTANT):
+You MUST respond with a single, valid JSON object and NOTHING ELSE. No markdown, no backticks, no additional text.
+The JSON must have ALL of these keys:
+
+{
+  "narrativeResponse": "Your in-character, narrative message to the player.",
+  "relevance": 0.0,
+  "progress": 0.0,
+  "reasoning": "Your brief, out-of-character reasoning for the scores."
+}
+
+- "narrativeResponse" must follow all GAME RULES above.
+- "relevance" and "progress" must be numbers between 0.0 and 1.0 (floats).
+- "reasoning" is out-of-character and visible only to the system; keep it short (1–3 sentences).
+
+HOW TO CALCULATE SCORES:
+
+1) "relevance" (0.0 to 1.0):
+   - This score reflects how close the PLAYER'S LATEST MESSAGE is to the truth of the mystery.
+   - 1.0: Player correctly identifies the culprit, motive, or a crucial piece of evidence's true significance.
+   - 0.7–0.9: Player is on the right track, asking sharp questions about the real culprit or key evidence.
+   - 0.4–0.6: Player is exploring a valid but secondary lead or a plausible red herring.
+   - 0.1–0.3: Player is focused on mostly irrelevant details or a dead end.
+   - 0.0: Player's message is completely off-topic or nonsensical.
+
+2) "progress" (0.0 to 1.0):
+   - This score reflects the PLAYER'S OVERALL PROGRESS in solving the entire mystery.
+   - It should only ever increase or stay the same across the whole game.
+   - The previous progress value up to this point is: ${previousProgress}.
+   - Your new "progress" MUST be greater than or equal to ${previousProgress}.
+   - 0.0: The game has just started.
+   - 0.25: Player has gathered some initial clues.
+   - 0.50: Player has identified a key piece of evidence and is questioning the right people.
+   - 0.75: Player has a strong theory and has likely identified the culprit but not the full motive/method.
+   - 1.0: Player has solved the case by correctly identifying the culprit, motive, AND method.
+
+3) "reasoning":
+   - Briefly explain your scoring and how the latest player message affects relevance and progress.
+   - Example: "Player correctly identified the significance of the ink stain, which is a major breakthrough. Progress increases significantly."
+
 GAME DATA (PLAYER-FACING IF YOU CHOOSE TO REVEAL IT IN NARRATIVE FORM):
 ${publicInfo}
 
-INTERNAL, SECRET INFORMATION (NEVER REVEAL DIRECTLY TO PLAYER):
+INTERNAL, SECRET INFORMATION (FOR AI ONLY – NEVER REVEAL DIRECTLY TO THE PLAYER):
 ${secretInfo}
 
 ${extraNotesSection}
@@ -130,9 +175,11 @@ ${extraNotesSection}
 CONVERSATION SO FAR:
 ${chatHistory || '(No prior messages. Start the investigation.)'}
 
-Continue the conversation as the Game Master. Answer only with what the Game Master would say next in this scene, in a single message.
+PLAYER'S LATEST MESSAGE (the main basis for relevance and progress this turn):
+${lastPlayerMessage}
 
-Game Master:
+Analyze the player's latest message in the context of the whole conversation and the secret information.
+Then produce ONLY the JSON object described above, with no extra text before or after.
 `.trim();
 };
 
@@ -162,14 +209,39 @@ export const sendChatMessage = async (
 	}
 
 	const chatHistory = await getChatHistory(gameSessionId);
-	const prompt = buildPrompt(caseData, chatHistory);
+	const lastGmMessage = [...chatHistory]
+		.reverse()
+		.find(
+			msg =>
+				msg.role === 'gameMaster' &&
+				msg.progress !== null &&
+				msg.progress !== undefined
+		);
+	const prompt = buildPrompt(
+		caseData,
+		chatHistory,
+		lastGmMessage?.progress ?? undefined
+	);
 	const result = await callGemini(prompt);
 
-	return await saveNewMessage({
-		gameSessionId,
-		role: 'gameMaster',
-		content: result ?? ''
-	});
+	try {
+		const data = JSON.parse(result!);
+
+		const parsedData = aiResponseSchema.parse(data);
+
+		console.log(parsedData);
+
+		return await saveNewMessage({
+			gameSessionId,
+			role: 'gameMaster',
+			content: parsedData.narrativeResponse,
+			progress: parsedData.progress,
+			relevance: parsedData.relevance
+		});
+	} catch (error) {
+		console.error('Error in sendChatMessage action:', error);
+		throw new Error('Failed to send message. Please try again.');
+	}
 };
 
 export const loadGameSession = async (caseId: string) => {
@@ -196,7 +268,8 @@ export const loadGameSession = async (caseId: string) => {
 			const initialMessage = await saveNewMessage({
 				gameSessionId: gameSession.id,
 				role: 'gameMaster',
-				content: caseDetails.summary
+				content: caseDetails.summary,
+				progress: 0
 			});
 
 			chatHistory.push(initialMessage);
