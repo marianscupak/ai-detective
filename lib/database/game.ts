@@ -1,4 +1,4 @@
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq, sql } from 'drizzle-orm';
 
 import { type DetectiveCase } from '@/types/case';
 import { type ChatMessage, type GameSession } from '@/types/game';
@@ -12,6 +12,36 @@ import {
 } from '@/db/schema/game-schema';
 
 // ---------- CASES ----------
+
+export const getOngoingUserInvestigations = async (userId: string) => {
+	return await db
+		.select({
+			caseId: detectiveCase.id,
+			caseTitle: detectiveCase.title,
+			caseTheme: detectiveCase.theme,
+			sessionId: gameSession.id,
+			startedAt: gameSession.startedAt,
+			progress: chatMessage.progress
+		})
+		.from(detectiveCase)
+		.innerJoin(gameSession, eq(detectiveCase.id, gameSession.caseId))
+		.leftJoin(
+			chatMessage,
+			eq(
+				chatMessage.id,
+				sql`(
+        			SELECT id
+        			FROM "chat_message"
+        			WHERE "chat_message".game_session_id = "game_session".id
+        			ORDER BY created_at DESC
+        			LIMIT 1
+      			)`
+			)
+		)
+		.where(
+			and(eq(gameSession.userId, userId), eq(gameSession.status, 'in-progress'))
+		);
+};
 
 export const getCaseById = async (
 	caseId: string
