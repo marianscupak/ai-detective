@@ -118,7 +118,7 @@ export const ChatRoom = ({
 	};
 
 	return (
-		<Card className="mx-auto flex h-screen w-full max-w-3xl flex-col">
+		<Card className="mx-auto flex h-full w-full max-w-3xl flex-col">
 			<CardHeader>
 				<CardTitle>{initialCaseDetails.title}</CardTitle>
 				<CardDescription>{initialCaseDetails.setting.location}</CardDescription>

@@ -8,14 +8,12 @@ const InvestigationPage = async () => {
 	);
 
 	return (
-		<div className="container mx-auto flex h-screen flex-col items-start gap-8 px-4 py-8 lg:flex-row">
-			<div className="w-full flex-grow">
-				<ChatRoom
-					initialCaseDetails={caseDetails}
-					initialGameSession={gameSession}
-					initialMessages={chatHistory}
-				/>
-			</div>
+		<div className="container mx-auto flex h-full flex-col items-start gap-8 px-4 py-8 lg:flex-row">
+			<ChatRoom
+				initialCaseDetails={caseDetails}
+				initialGameSession={gameSession}
+				initialMessages={chatHistory}
+			/>
 
 			<div className="w-full lg:w-auto">
 				<SideControls gameSessionId={gameSession.id} />
