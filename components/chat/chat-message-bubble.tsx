@@ -4,6 +4,11 @@ import type { ChatMessage } from '@/types/game';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { MessageLoading } from '@/components/chat/message-loading';
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger
+} from '@/components/ui/tooltip';
 
 const MessageContentWrapper = ({
 	children,
@@ -19,13 +24,19 @@ const MessageContentWrapper = ({
 	</div>
 );
 
-export const ChatMessageBubble = ({
-	message,
-	relevanceForPlayer
-}: {
+type Props = {
 	message: ChatMessage | (Pick<ChatMessage, 'role'> & { loading: true });
 	relevanceForPlayer?: number;
-}) => {
+	isGameFinished?: boolean;
+	reasoningForPlayer?: string;
+};
+
+export const ChatMessageBubble = ({
+	message,
+	relevanceForPlayer,
+	isGameFinished,
+	reasoningForPlayer
+}: Props) => {
 	const isPlayer = message.role === 'player';
 
 	const relevanceLabel = (r: number) => {
@@ -36,47 +47,72 @@ export const ChatMessageBubble = ({
 		return 'Way off';
 	};
 
-	return (
-		<div
-			className={cn(
-				'flex flex-col gap-1',
-				isPlayer ? 'items-end' : 'items-start'
+	const canShowTooltip = isGameFinished && !!reasoningForPlayer;
+
+	const PlayerMessageContent = () => (
+		<div className="flex flex-col items-end gap-1">
+			{'loading' in message ? (
+				<MessageContentWrapper isPlayer={isPlayer}>
+					<MessageLoading />
+				</MessageContentWrapper>
+			) : (
+				<MessageContentWrapper isPlayer={isPlayer}>
+					<p className="whitespace-pre-wrap">{message.content}</p>
+				</MessageContentWrapper>
 			)}
-		>
-			<div
-				className={cn(
-					'flex w-full items-start gap-3',
-					isPlayer ? 'justify-end' : 'justify-start'
-				)}
-			>
-				{!isPlayer && (
-					<Avatar className="h-8 w-8">
-						<AvatarFallback>GM</AvatarFallback>
-					</Avatar>
-				)}
 
-				{'loading' in message ? (
-					<MessageContentWrapper isPlayer={isPlayer}>
-						<MessageLoading />
-					</MessageContentWrapper>
-				) : (
-					<MessageContentWrapper isPlayer={isPlayer}>
-						<p className="whitespace-pre-wrap">{message.content}</p>
-					</MessageContentWrapper>
-				)}
-
-				{isPlayer && (
-					<Avatar className="h-8 w-8">
-						<AvatarFallback>YOU</AvatarFallback>
-					</Avatar>
-				)}
-			</div>
-
-			{isPlayer && relevanceForPlayer && (
+			{relevanceForPlayer !== undefined && (
 				<span className="text-muted-foreground text-[10px]">
 					{relevanceLabel(relevanceForPlayer)} (
 					{Math.round(relevanceForPlayer * 100)}%)
 				</span>
+			)}
+		</div>
+	);
+
+	return (
+		<div
+			className={cn(
+				'flex w-full items-start gap-3',
+				isPlayer ? 'justify-end' : 'justify-start'
+			)}
+		>
+			{!isPlayer && (
+				<Avatar className="h-8 w-8">
+					<AvatarFallback>GM</AvatarFallback>
+				</Avatar>
+			)}
+
+			{isPlayer ? (
+				canShowTooltip ? (
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<div className="cursor-help">
+								<PlayerMessageContent />
+							</div>
+						</TooltipTrigger>
+						<TooltipContent className="max-w-xs" side="top">
+							<p className="font-bold">AI Reasoning:</p>
+							<p>{reasoningForPlayer}</p>
+						</TooltipContent>
+					</Tooltip>
+				) : (
+					<PlayerMessageContent />
+				)
+			) : 'loading' in message ? (
+				<MessageContentWrapper isPlayer={isPlayer}>
+					<MessageLoading />
+				</MessageContentWrapper>
+			) : (
+				<MessageContentWrapper isPlayer={isPlayer}>
+					<p className="whitespace-pre-wrap">{message.content}</p>
+				</MessageContentWrapper>
+			)}
+
+			{isPlayer && (
+				<Avatar className="h-8 w-8">
+					<AvatarFallback>YOU</AvatarFallback>
+				</Avatar>
 			)}
 		</div>
 	);

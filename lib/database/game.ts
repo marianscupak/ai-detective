@@ -1,7 +1,11 @@
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, eq, or } from 'drizzle-orm';
 
 import { type DetectiveCase } from '@/types/case';
-import { type ChatMessage, type GameSession } from '@/types/game';
+import {
+	type ChatMessage,
+	type GameSession,
+	type GameStatus
+} from '@/types/game';
 import { db } from '@/db';
 import {
 	detectiveCase,
@@ -106,7 +110,10 @@ export const findOrCreateGameSession = async (
 			and(
 				eq(gameSession.userId, userId),
 				eq(gameSession.caseId, caseId),
-				eq(gameSession.status, 'in-progress')
+				or(
+					eq(gameSession.status, 'completed'),
+					eq(gameSession.status, 'in-progress')
+				)
 			)
 		)
 		.limit(1);
@@ -118,7 +125,8 @@ export const findOrCreateGameSession = async (
 			caseId: existing.caseId,
 			status: existing.status as GameSession['status'],
 			startedAt: new Date(existing.startedAt),
-			updatedAt: new Date(existing.updatedAt)
+			updatedAt: new Date(existing.updatedAt),
+			progress: existing.progress ?? 0
 		};
 	}
 
@@ -140,7 +148,48 @@ export const findOrCreateGameSession = async (
 		caseId,
 		status: 'in-progress',
 		startedAt: now,
-		updatedAt: now
+		updatedAt: now,
+		progress: 0
+	};
+};
+
+export const updateGameSessionStatus = async (
+	gameSessionId: string,
+	status: GameStatus
+): Promise<void> => {
+	await db
+		.update(gameSession)
+		.set({ status })
+		.where(eq(gameSession.id, gameSessionId));
+};
+
+export const updateGameSessionProgress = async (
+	gameSessionId: string,
+	progress: number
+): Promise<void> => {
+	await db
+		.update(gameSession)
+		.set({ progress })
+		.where(eq(gameSession.id, gameSessionId));
+};
+
+export const getGameSessionById = async (
+	gameSessionId: string
+): Promise<GameSession | null> => {
+	const [row] = await db
+		.select()
+		.from(gameSession)
+		.where(eq(gameSession.id, gameSessionId));
+	if (!row) return null;
+
+	return {
+		id: row.id,
+		userId: row.userId,
+		caseId: row.caseId,
+		status: row.status as GameSession['status'],
+		startedAt: new Date(row.startedAt),
+		updatedAt: new Date(row.updatedAt),
+		progress: row.progress ?? 0
 	};
 };
 
@@ -161,8 +210,8 @@ export const getChatHistory = async (
 		role: row.role as ChatMessage['role'],
 		content: row.content,
 		createdAt: new Date(row.createdAt),
-		progress: row.progress,
-		relevance: row.relevance
+		relevance: row.relevance,
+		reasoning: row.reasoning
 	}));
 };
 
@@ -177,8 +226,8 @@ export const saveNewMessage = async (
 		gameSessionId: message.gameSessionId,
 		role: message.role,
 		content: message.content,
-		progress: message.progress,
 		relevance: message.relevance,
+		reasoning: message.reasoning,
 		createdAt: now
 	});
 
@@ -187,7 +236,7 @@ export const saveNewMessage = async (
 		gameSessionId: message.gameSessionId,
 		role: message.role,
 		content: message.content,
-		progress: message.progress,
+		reasoning: message.reasoning,
 		relevance: message.relevance,
 		createdAt: now
 	};
