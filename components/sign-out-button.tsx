@@ -1,17 +1,22 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { LogOut } from 'lucide-react';
 
 import { authClient } from '@/lib/auth-client';
+import { cn } from '@/lib/cn';
 
-export const SignOutButton = () => {
+type SignOutButtonProps = {
+	className?: string;
+};
+
+export const SignOutButton = ({ className }: SignOutButtonProps) => {
 	const router = useRouter();
 
 	return (
 		<button
-			className="rounded-xl bg-gray-300 p-2 text-black"
 			type="button"
-			onClick={async () =>
+			onClick={async () => {
 				await authClient.signOut({
 					fetchOptions: {
 						onSuccess: () => {
@@ -19,10 +24,17 @@ export const SignOutButton = () => {
 							router.refresh();
 						}
 					}
-				})
-			}
+				});
+			}}
+			className={cn(
+				'flex items-center gap-2 font-medium text-gray-700 transition hover:text-blue-700 dark:text-gray-200',
+				className
+			)}
 		>
-			Sign out
+			<LogOut className="h-5 w-5" />
+			<span>Sign out</span>
 		</button>
 	);
 };
+
+export default SignOutButton;

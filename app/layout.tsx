@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 
 import './globals.css';
-import Header from '@/components/header';
+import { Navigation } from '@/components/navigation';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -27,9 +27,9 @@ const RootLayout = ({
 	return (
 		<html lang="en">
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} flex h-screen flex-col antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
-				<Header />
+				<Navigation />
 				<div className="flex-1 overflow-auto bg-slate-50">{children}</div>
 			</body>
 		</html>
