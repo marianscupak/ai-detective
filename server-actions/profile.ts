@@ -3,7 +3,10 @@
 import { headers } from 'next/headers';
 
 import { auth } from '@/lib/auth';
-import { getOngoingUserInvestigations } from '@/lib/database/game';
+import {
+	getCompletedUserInvestigations,
+	getOngoingUserInvestigations
+} from '@/lib/database/game';
 import {
 	updateProfileSchema,
 	type UpdateProfileDto
@@ -45,5 +48,5 @@ export const getCompletedInvestigations = async () => {
 		throw new Error('Unauthorized: You must be logged in to send a message.');
 	}
 
-	return await getOngoingInvestigations();
+	return await getCompletedUserInvestigations(session.user.id);
 };

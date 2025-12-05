@@ -1,4 +1,4 @@
-import { and, asc, eq, or } from 'drizzle-orm';
+import { and, asc, count, eq, or } from 'drizzle-orm';
 
 import { type DetectiveCase } from '@/types/case';
 import {
@@ -22,7 +22,6 @@ export const getOngoingUserInvestigations = async (userId: string) => {
 		.select({
 			caseId: detectiveCase.id,
 			caseTitle: detectiveCase.title,
-			caseTheme: detectiveCase.theme,
 			sessionId: gameSession.id,
 			startedAt: gameSession.startedAt,
 			progress: gameSession.progress
@@ -31,6 +30,29 @@ export const getOngoingUserInvestigations = async (userId: string) => {
 		.innerJoin(gameSession, eq(detectiveCase.id, gameSession.caseId))
 		.where(
 			and(eq(gameSession.userId, userId), eq(gameSession.status, 'in-progress'))
+		);
+};
+
+export const getCompletedUserInvestigations = async (userId: string) => {
+	return await db
+		.select({
+			caseId: detectiveCase.id,
+			caseTitle: detectiveCase.title,
+			sessionId: gameSession.id,
+			startedAt: gameSession.updatedAt,
+			messages: count(chatMessage.id)
+		})
+		.from(detectiveCase)
+		.innerJoin(gameSession, eq(detectiveCase.id, gameSession.caseId))
+		.leftJoin(
+			chatMessage,
+			and(
+				eq(gameSession.id, chatMessage.gameSessionId),
+				eq(chatMessage.role, 'player')
+			)
+		)
+		.where(
+			and(eq(gameSession.userId, userId), eq(gameSession.status, 'completed'))
 		);
 };
 

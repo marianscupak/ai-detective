@@ -18,8 +18,8 @@ const CompletedInvestigationList = async () => {
 				<div className="flex flex-col text-sm text-gray-700 md:gap-1 md:text-xs lg:gap-0">
 					<div>Completed at {format(inv.startedAt, 'MM.dd. p')}</div>
 					<div>
-						Total time spent:{' '}
-						<span className="font-bold">{(inv.progress ?? 0) * 100}%</span>
+						Total player messages:{' '}
+						<span className="font-bold">{inv.messages}</span>
 					</div>
 				</div>
 			</div>
