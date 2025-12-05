@@ -15,6 +15,11 @@ import { auth } from '@/lib/auth';
 import { type DetectiveCase } from '@/types/case';
 import { aiResponseSchema, type ChatMessage } from '@/types/game';
 import { callGemini } from '@/lib/gemini';
+import {
+	handleAbandonGameAchievements,
+	handleCompleteGameAchievements,
+	handleSendMessageAchievements
+} from '@/lib/achievements';
 
 const buildPrompt = (
 	caseData: DetectiveCase,
@@ -240,11 +245,13 @@ export const sendChatMessage = async (
 			relevance: parsedData.relevance,
 			reasoning: parsedData.reasoning
 		});
+		await handleSendMessageAchievements(session.user.id, gameSessionId);
 
 		await updateGameSessionProgress(gameSessionId, parsedData.progress);
 
 		if (parsedData.isSolved) {
 			await updateGameSessionStatus(gameSessionId, 'completed');
+			await handleCompleteGameAchievements(session.user.id, gameSessionId);
 		}
 
 		return savedMessage;
@@ -319,8 +326,17 @@ export const abandonGameSession = async (gameSessionId: string) => {
 		);
 	}
 
+	const gameSession = await getGameSessionById(gameSessionId);
+
+	if (gameSession?.userId !== session.user.id) {
+		throw new Error(
+			'Forbidden: Game session does not exist or belongs to another user.'
+		);
+	}
+
 	try {
 		await updateGameSessionStatus(gameSessionId, 'abandoned');
+		await handleAbandonGameAchievements(session.user.id, gameSession);
 
 		return { success: true };
 	} catch (error) {
