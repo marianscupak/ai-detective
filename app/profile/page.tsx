@@ -1,24 +1,13 @@
-import { headers } from 'next/headers';
-import { Pencil } from 'lucide-react';
-
-import { auth } from '@/lib/auth';
-
 import OngoingInvestigations from './components/ongoing-investigations';
 import CompletedInvestigations from './components/completed-investigations';
+import ProfileInfo from './components/profile-info';
 
-const ProfilePage = async () => {
-	const session = await auth.api.getSession({
-		headers: await headers()
-	});
-
+const ProfilePage = () => {
 	return (
-		<div className="flex h-full gap-4 px-24 py-6 text-black">
-			<div className="flex h-full w-32 shrink-0 flex-col gap-4 lg:w-40 xl:w-48">
-				<div className="flex h-fit items-center gap-2 rounded-lg border bg-white p-3 shadow-sm">
-					{/* TODO: Edit profiel actions */}
-					{session!.user.name} <Pencil className="ml-auto size-4 shrink-0" />
-				</div>
-				<div className="h-full rounded-lg border bg-white p-1 shadow-sm">
+		<div className="flex h-full flex-col gap-6 p-2 text-black md:flex-row md:gap-4 md:px-24 md:py-6">
+			<div className="flex w-full shrink-0 flex-col gap-6 md:h-full md:w-32 md:gap-4 lg:w-40 xl:w-48">
+				<ProfileInfo />
+				<div className="h-fit rounded-lg border bg-white p-1 shadow-sm md:h-full">
 					Badges
 				</div>
 			</div>

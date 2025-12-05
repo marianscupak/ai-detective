@@ -1,16 +1,15 @@
-import { headers } from 'next/headers';
+'use client';
+
 import Link from 'next/link';
 
-import { auth } from '@/lib/auth';
+import { authClient } from '@/lib/auth-client';
 
 import { SignOutButton } from './sign-out-button';
 
-const ProfileLink = async () => {
-	const session = await auth.api.getSession({
-		headers: await headers()
-	});
+const ProfileLink = () => {
+	const { data } = authClient.useSession();
 
-	if (!session) {
+	if (!data?.session) {
 		return (
 			<Link href="/sign-in" className="text-xl font-medium text-black">
 				Sign in
@@ -21,7 +20,7 @@ const ProfileLink = async () => {
 	return (
 		<div className="flex items-center gap-3">
 			<Link href="/profile" className="text-xl font-medium text-black">
-				{session.user.name}
+				{data?.user.name}
 			</Link>
 			<SignOutButton />
 		</div>
