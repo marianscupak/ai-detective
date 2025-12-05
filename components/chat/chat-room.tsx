@@ -6,7 +6,8 @@ import {
 	useRef,
 	useState,
 	useTransition,
-	type FormEvent
+	type FormEvent,
+	useCallback
 } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -22,9 +23,11 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { type DetectiveCase } from '@/types/case';
 import { type ChatMessage, type GameSession } from '@/types/game';
-import { sendChatMessage } from '@/server-actions/game';
+import { getGameSessionStatus, sendChatMessage } from '@/server-actions/game';
 import { ChatMessageBubble } from '@/components/chat/chat-message-bubble';
 import { AiMessageLoadingBubble } from '@/components/chat/ai-message-loading-bubble';
+import { GameConclusion } from '@/components/chat/game-conclusion';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 type ChatRoomProps = {
 	initialCaseDetails: DetectiveCase;
@@ -42,27 +45,34 @@ export const ChatRoom = ({
 	const [isPending, startTransition] = useTransition();
 	const inputRef = useRef<HTMLInputElement | null>(null);
 
-	const currentProgress =
-		messages
-			.toReversed()
-			.find(
-				m =>
-					m.role === 'gameMaster' &&
-					m.progress !== null &&
-					m.progress !== undefined
-			)?.progress ?? 0;
+	const [isGameFinished, setIsGameFinished] = useState(
+		initialGameSession.status === 'completed'
+	);
+
+	const [currentProgress, setCurrentProgress] = useState(
+		initialGameSession.progress ?? 0
+	);
 
 	useEffect(() => {
-		if (!isPending) {
+		if (!isPending && !isGameFinished) {
 			inputRef.current?.focus();
 		}
-	}, [isPending]);
+	}, [isPending, isGameFinished]);
 
 	const bottomRef = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
 		bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
 	}, [messages.length]);
+
+	const reloadProgress = useCallback(async () => {
+		const gameSession = await getGameSessionStatus(initialGameSession.id);
+		setCurrentProgress(gameSession.progress ?? 0);
+
+		if (gameSession.status === 'completed') {
+			setIsGameFinished(true);
+		}
+	}, [initialGameSession.id]);
 
 	const handleSendMessage = async (e: FormEvent) => {
 		e.preventDefault();
@@ -90,6 +100,8 @@ export const ChatRoom = ({
 					content
 				);
 				setMessages(prev => [...prev, aiMessage]);
+
+				await reloadProgress();
 			} catch {
 				setMessages(prev => [
 					...prev,
@@ -106,7 +118,7 @@ export const ChatRoom = ({
 	};
 
 	return (
-		<Card className="mx-auto flex h-[95%] w-full max-w-3xl flex-col">
+		<Card className="mx-auto flex h-full w-full max-w-3xl flex-col">
 			<CardHeader>
 				<CardTitle>{initialCaseDetails.title}</CardTitle>
 				<CardDescription>{initialCaseDetails.setting.location}</CardDescription>
@@ -127,54 +139,68 @@ export const ChatRoom = ({
 
 			<CardContent className="flex-1 overflow-hidden">
 				<ScrollArea className="h-full pr-4">
-					<div className="flex h-full flex-col space-y-6">
-						{messages.map((message, index) => {
-							const next = messages[index + 1];
+					<TooltipProvider delayDuration={200}>
+						<div className="flex h-full flex-col space-y-6">
+							{messages.map((message, index) => {
+								const next = messages[index + 1];
 
-							const relevanceForPlayer =
-								message.role === 'player' &&
-								next?.role === 'gameMaster' &&
-								'relevance' in next &&
-								typeof next.relevance === 'number'
-									? next.relevance
-									: undefined;
+								const relevanceForPlayer =
+									message.role === 'player' &&
+									next?.role === 'gameMaster' &&
+									typeof next.relevance === 'number'
+										? next.relevance
+										: undefined;
 
-							return (
-								<ChatMessageBubble
-									key={message.id}
-									message={message}
-									relevanceForPlayer={relevanceForPlayer}
-								/>
-							);
-						})}
+								const relevanceReasoningForPlayer =
+									message.role === 'player' &&
+									next?.role === 'gameMaster' &&
+									typeof next.reasoning === 'string'
+										? next.reasoning
+										: undefined;
 
-						{isPending && <AiMessageLoadingBubble />}
-						<div ref={bottomRef} />
-					</div>
+								return (
+									<ChatMessageBubble
+										key={message.id}
+										message={message}
+										relevanceForPlayer={relevanceForPlayer}
+										reasoningForPlayer={relevanceReasoningForPlayer}
+										isGameFinished={isGameFinished}
+									/>
+								);
+							})}
+
+							{isPending && <AiMessageLoadingBubble />}
+							<div ref={bottomRef} />
+						</div>
+					</TooltipProvider>
 				</ScrollArea>
 			</CardContent>
 
 			<CardFooter>
-				<form
-					onSubmit={handleSendMessage}
-					className="flex w-full items-center space-x-2"
-				>
-					<Input
-						ref={inputRef}
-						placeholder={
-							isPending ? 'The AI is thinking…' : 'Type your theory…'
-						}
-						className="flex-1"
-						autoComplete="off"
-						value={input}
-						onChange={e => setInput(e.target.value)}
-						disabled={isPending}
-					/>
-					<Button type="submit" size="icon" disabled={isPending}>
-						<SendHorizontal className="h-4 w-4" />
-						<span className="sr-only">Send</span>
-					</Button>
-				</form>
+				{isGameFinished ? (
+					<GameConclusion />
+				) : (
+					<form
+						onSubmit={handleSendMessage}
+						className="flex w-full items-center space-x-2"
+					>
+						<Input
+							ref={inputRef}
+							placeholder={
+								isPending ? 'The game master is thinking…' : 'Type your theory…'
+							}
+							className="flex-1"
+							autoComplete="off"
+							value={input}
+							onChange={e => setInput(e.target.value)}
+							disabled={isPending}
+						/>
+						<Button type="submit" size="icon" disabled={isPending}>
+							<SendHorizontal className="h-4 w-4" />
+							<span className="sr-only">Send</span>
+						</Button>
+					</form>
+				)}
 			</CardFooter>
 		</Card>
 	);
