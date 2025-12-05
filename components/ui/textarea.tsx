@@ -1,18 +1,47 @@
-import * as React from "react"
+'use client';
 
-import { cn } from "@/lib/utils"
+import * as React from 'react';
+import TextareaAutosize from 'react-textarea-autosize';
 
-function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
-  return (
-    <textarea
-      data-slot="textarea"
-      className={cn(
-        "border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        className
-      )}
-      {...props}
-    />
-  )
-}
+import { cn } from '@/lib/utils';
 
-export { Textarea }
+export type AutosizeTextareaProps = React.ComponentPropsWithoutRef<
+	typeof TextareaAutosize
+>;
+
+export const Textarea = React.forwardRef<
+	HTMLTextAreaElement,
+	AutosizeTextareaProps
+>(({ className, ...props }, ref) => {
+	return (
+		<TextareaAutosize
+			ref={ref}
+			className={cn(
+				'border-input bg-background flex min-h-[2.25rem] w-full rounded-md border px-3 py-2 text-sm',
+				'ring-offset-background placeholder:text-muted-foreground',
+				'focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
+				'disabled:cursor-not-allowed disabled:opacity-50',
+				'resize-none',
+				'max-h-40',
+				className
+			)}
+			minRows={1}
+			maxRows={8}
+			onKeyDown={e => {
+				if (e.key === 'Enter' && e.shiftKey) return;
+
+				if (e.key === 'Enter') {
+					e.preventDefault();
+
+					const form = e.currentTarget.closest('form');
+					if (form) {
+						form.requestSubmit();
+					}
+				}
+			}}
+			{...props}
+		/>
+	);
+});
+
+Textarea.displayName = 'Textarea';

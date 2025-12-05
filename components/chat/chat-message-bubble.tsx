@@ -10,14 +10,21 @@ import {
 	TooltipTrigger
 } from '@/components/ui/tooltip';
 
+type BubbleVariant = 'player' | 'gm' | 'hintRequest' | 'hintResponse';
+
 const MessageContentWrapper = ({
 	children,
-	isPlayer
-}: PropsWithChildren<{ isPlayer: boolean }>) => (
+	variant
+}: PropsWithChildren<{ variant: BubbleVariant }>) => (
 	<div
 		className={cn(
 			'max-w-sm rounded-lg px-4 py-2 text-sm',
-			isPlayer ? 'bg-primary text-primary-foreground' : 'bg-muted'
+			variant === 'player' && 'bg-primary text-primary-foreground',
+			variant === 'gm' && 'bg-muted',
+			variant === 'hintRequest' &&
+				'bg-amber-100 text-amber-950 dark:bg-amber-900 dark:text-amber-50',
+			variant === 'hintResponse' &&
+				'bg-sky-100 text-sky-950 dark:bg-sky-900 dark:text-sky-50'
 		)}
 	>
 		{children}
@@ -38,6 +45,21 @@ export const ChatMessageBubble = ({
 	reasoningForPlayer
 }: Props) => {
 	const isPlayer = message.role === 'player';
+	const isLoading = 'loading' in message;
+
+	let bubbleVariant: BubbleVariant;
+
+	if (!isLoading) {
+		if (message.type === 'hintRequest') {
+			bubbleVariant = 'hintRequest';
+		} else if (message.type === 'hintResponse') {
+			bubbleVariant = 'hintResponse';
+		} else {
+			bubbleVariant = isPlayer ? 'player' : 'gm';
+		}
+	} else {
+		bubbleVariant = isPlayer ? 'player' : 'gm';
+	}
 
 	const relevanceLabel = (r: number) => {
 		if (r >= 0.9) return 'Bullseye';
@@ -49,14 +71,20 @@ export const ChatMessageBubble = ({
 
 	const canShowTooltip = isGameFinished && !!reasoningForPlayer;
 
-	const PlayerMessageContent = () => (
+	const PlayerMessageContent = ({ variant }: { variant: BubbleVariant }) => (
 		<div className="flex flex-col items-end gap-1">
-			{'loading' in message ? (
-				<MessageContentWrapper isPlayer={isPlayer}>
+			{!isLoading && message.type === 'hintRequest' && (
+				<span className="text-[10px] font-semibold tracking-wide text-amber-600 uppercase dark:text-amber-300">
+					Hint requested
+				</span>
+			)}
+
+			{isLoading ? (
+				<MessageContentWrapper variant={variant}>
 					<MessageLoading />
 				</MessageContentWrapper>
 			) : (
-				<MessageContentWrapper isPlayer={isPlayer}>
+				<MessageContentWrapper variant={variant}>
 					<p className="whitespace-pre-wrap">{message.content}</p>
 				</MessageContentWrapper>
 			)}
@@ -88,7 +116,7 @@ export const ChatMessageBubble = ({
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<div className="cursor-help">
-								<PlayerMessageContent />
+								<PlayerMessageContent variant={bubbleVariant} />
 							</div>
 						</TooltipTrigger>
 						<TooltipContent className="max-w-xs" side="top">
@@ -97,16 +125,24 @@ export const ChatMessageBubble = ({
 						</TooltipContent>
 					</Tooltip>
 				) : (
-					<PlayerMessageContent />
+					<PlayerMessageContent variant={bubbleVariant} />
 				)
-			) : 'loading' in message ? (
-				<MessageContentWrapper isPlayer={isPlayer}>
+			) : isLoading ? (
+				<MessageContentWrapper variant={bubbleVariant}>
 					<MessageLoading />
 				</MessageContentWrapper>
 			) : (
-				<MessageContentWrapper isPlayer={isPlayer}>
-					<p className="whitespace-pre-wrap">{message.content}</p>
-				</MessageContentWrapper>
+				<div className="flex flex-col items-start gap-1">
+					{message.type === 'hintResponse' && (
+						<span className="text-[10px] font-semibold tracking-wide text-sky-600 uppercase dark:text-sky-300">
+							Hint
+						</span>
+					)}
+
+					<MessageContentWrapper variant={bubbleVariant}>
+						<p className="whitespace-pre-wrap">{message.content}</p>
+					</MessageContentWrapper>
+				</div>
 			)}
 
 			{isPlayer && (

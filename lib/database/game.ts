@@ -284,6 +284,7 @@ export const saveNewMessage = async (
 		content: message.content,
 		relevance: message.relevance,
 		reasoning: message.reasoning,
+		type: message.type ?? 'normal',
 		createdAt: now
 	});
 

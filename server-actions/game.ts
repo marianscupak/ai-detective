@@ -312,8 +312,9 @@ In this mode:
 - Keep hints focused on what the player should *do next* or *re-examine*.
 - The hints should relate to the player's CURRENT understanding and the conversation so far.
 
-RESPONSE FORMAT (JSON ONLY – NO MARKDOWN, NO EXTRA TEXT):
-
+RESPONSE FORMAT (VERY IMPORTANT):
+You MUST respond with a single, valid JSON object and NOTHING ELSE. No markdown, no backticks, no additional text.
+The JSON must have ALL of these keys:
 {
   "narrativeResponse": "Your hint message to the player.",
   "relevance": 0.0,
