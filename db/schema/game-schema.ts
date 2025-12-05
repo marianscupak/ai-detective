@@ -136,6 +136,8 @@ export const chatMessage = sqliteTable(
 		// 'player' | 'gameMaster'
 		role: text('role').notNull(),
 		content: text('content').notNull(),
+		// 'normal' | 'hintRequest' | 'hintResponse
+		type: text('type').default('normal').notNull(),
 
 		relevance: real('relevance'),
 		reasoning: text('reasoning'),

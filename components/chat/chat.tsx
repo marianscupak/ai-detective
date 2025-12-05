@@ -7,7 +7,9 @@ import {
 	useState,
 	useTransition,
 	type FormEvent,
-	useCallback
+	useCallback,
+	type Dispatch,
+	type SetStateAction
 } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -32,15 +34,16 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 type ChatRoomProps = {
 	initialCaseDetails: DetectiveCase;
 	initialGameSession: GameSession;
-	initialMessages: ChatMessage[];
+	messages: ChatMessage[];
+	setMessages: Dispatch<SetStateAction<ChatMessage[]>>;
 };
 
-export const ChatRoom = ({
+export const Chat = ({
 	initialCaseDetails,
 	initialGameSession,
-	initialMessages
+	messages,
+	setMessages
 }: ChatRoomProps) => {
-	const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
 	const [input, setInput] = useState('');
 	const [isPending, startTransition] = useTransition();
 	const inputRef = useRef<HTMLInputElement | null>(null);
