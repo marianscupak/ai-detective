@@ -9,6 +9,7 @@ export type Character = {
 	id: string; // Unique ID to internally reference this character (e.g., 'char-julian').
 	name: string; // The character's full name (e.g., "Julian Croft").
 	description: string; // A brief on their personality, appearance, and connection to the case.
+	role: string; // Character's role in a story
 };
 
 /**
@@ -17,6 +18,7 @@ export type Character = {
 export type VictimOrTarget = {
 	name: string; // Name of the person or item (e.g., "Arthur Blackwood", "The Serpent's Eye Diamond").
 	description: string; // Details about who they were or what it is.
+	role: string; // Character's role in a story
 };
 
 /**
@@ -72,4 +74,25 @@ export type DetectiveCase = {
 
 	// --- Optional Context ---
 	notesForAI?: string; // "Optional pole" - A place for the author to give the AI extra instructions or context.
+};
+
+export type DetectiveCaseBaseView = {
+	id: string; // Unique case identifier (e.g. "case-orient-express-01")
+	authorId: string; // ID of the user who created the case
+	createdAt: Date;
+
+	title: string; // Case title shown in library
+	theme: string; // Category / genre (e.g. "train-mystery")
+	summary: string; // Short case summary for previews
+
+	location: string; // Where the crime happened
+	dateTime: string; // When it happened (string stored in DB)
+	incident: string; // Core description of what happened
+
+	// --- Solution (not shown to player) ---
+	culpritCharacterId: string; // Character ID of the culprit
+	motive: string; // Why the culprit committed the crime
+	method: string; // How the crime was executed
+
+	notesForAI?: string | null; // Extra instructions for the AI (optional)
 };
