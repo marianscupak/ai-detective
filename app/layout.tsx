@@ -30,7 +30,7 @@ const RootLayout = ({
 				className={`${geistSans.variable} ${geistMono.variable} flex h-screen flex-col antialiased`}
 			>
 				<Header />
-				<div className="flex-1 overflow-auto">{children}</div>
+				<div className="flex-1 overflow-auto bg-slate-50">{children}</div>
 			</body>
 		</html>
 	);
