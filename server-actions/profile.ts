@@ -11,6 +11,10 @@ import {
 	updateProfileSchema,
 	type UpdateProfileDto
 } from '@/lib/schema/profile';
+import {
+	type CompletedUserInvestigation,
+	type OngoingUserInvestigation
+} from '@/types/game';
 
 export const updateUserProfile = async (data: UpdateProfileDto) => {
 	const validatedInput = await updateProfileSchema.safeParseAsync(data);
@@ -27,7 +31,9 @@ export const updateUserProfile = async (data: UpdateProfileDto) => {
 	});
 };
 
-export const getOngoingInvestigations = async () => {
+export const getOngoingInvestigations = async (): Promise<
+	OngoingUserInvestigation[]
+> => {
 	const session = await auth.api.getSession({
 		headers: await headers()
 	});
@@ -39,7 +45,9 @@ export const getOngoingInvestigations = async () => {
 	return await getOngoingUserInvestigations(session.user.id);
 };
 
-export const getCompletedInvestigations = async () => {
+export const getCompletedInvestigations = async (): Promise<
+	CompletedUserInvestigation[]
+> => {
 	const session = await auth.api.getSession({
 		headers: await headers()
 	});

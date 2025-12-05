@@ -69,3 +69,19 @@ export const aiResponseSchema = z.object({
 });
 
 export type AiResponse = z.infer<typeof aiResponseSchema>;
+
+export type OngoingUserInvestigation = {
+	caseId: string;
+	caseTitle: string;
+	sessionId: string;
+	startedAt: Date;
+	progress: number | null;
+};
+
+export type CompletedUserInvestigation = {
+	caseId: string;
+	caseTitle: string;
+	sessionId: string;
+	startedAt: Date;
+	messages: number;
+};
