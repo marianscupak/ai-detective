@@ -254,6 +254,20 @@ export const getChatHistory = async (
 	}));
 };
 
+export const getChatHistoryCount = async (gameSessionId: string) => {
+	const [messages] = await db
+		.select({ count: count(chatMessage.id) })
+		.from(chatMessage)
+		.where(
+			and(
+				eq(chatMessage.gameSessionId, gameSessionId),
+				eq(chatMessage.role, 'player')
+			)
+		);
+
+	return messages.count;
+};
+
 export const saveNewMessage = async (
 	message: Omit<ChatMessage, 'id' | 'createdAt'>
 ): Promise<ChatMessage> => {

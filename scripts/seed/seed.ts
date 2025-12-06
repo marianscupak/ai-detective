@@ -8,6 +8,7 @@ import {
 	caseEvidence
 } from '@/db/schema/game-schema';
 import { SEED_AUTHOR_ID } from '@/scripts/seed/constants';
+import { achievement } from '@/db/schema/achievement-schema';
 
 const MOCK_CASES: DetectiveCase[] = [
 	{
@@ -97,6 +98,45 @@ const MOCK_CASES: DetectiveCase[] = [
 	}
 ];
 
+export const seedAchievements = async () => {
+	const achievements = [
+		{
+			id: 'first-case-closed',
+			title: 'First Case Closed',
+			description: 'Solve your first mystery case.'
+		},
+		{
+			id: 'storyteller',
+			title: 'Storyteller',
+			description: 'Publish your first custom detective story.'
+		},
+		{
+			id: 'master-sleuth',
+			title: 'Master Sleuth',
+			description: 'Solve a case without using any hints.'
+		},
+		{
+			id: 'quick-wit',
+			title: 'Quick Wit',
+			description: 'Solve a case using fewer than 25 messages.'
+		},
+		{
+			id: 'long-winded-detective',
+			title: 'Long-Winded Detective',
+			description: 'Spend more than 100 messages solving a single case.'
+		},
+		{
+			id: 'so-close-yet-so-far',
+			title: 'So Close Yet So Far',
+			description: 'Abandon an investigation with more than 90% progress.'
+		}
+	];
+
+	await db.insert(achievement).values(achievements).onConflictDoNothing();
+
+	console.log('Achievements seeded.');
+};
+
 export const seedData = async () => {
 	for (const mock of MOCK_CASES) {
 		const [existing] = await db
@@ -165,6 +205,8 @@ export const seedData = async () => {
 
 		console.log(`[seed] Case ${mock.id} inserted.`);
 	}
+
+	await seedAchievements();
 
 	console.log('[seed] Dev data seeding complete.');
 };
