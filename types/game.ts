@@ -36,6 +36,8 @@ export type GameSession = {
  */
 export type ChatMessageRole = 'player' | 'gameMaster';
 
+export type ChatMessageType = 'normal' | 'hintRequest' | 'hintResponse';
+
 /**
  * Represents a single message within a GameSession's chat history.
  */
@@ -58,6 +60,8 @@ export type ChatMessage = {
 	relevance?: number | null;
 
 	reasoning?: string | null;
+
+	type: ChatMessageType;
 };
 
 export const aiResponseSchema = z.object({
@@ -69,6 +73,16 @@ export const aiResponseSchema = z.object({
 });
 
 export type AiResponse = z.infer<typeof aiResponseSchema>;
+
+export type HintFocus =
+	| 'general'
+	| 'next-step'
+	| 'evidence'
+	| 'suspect'
+	| 'motive'
+	| 'method';
+
+export type HintSubtlety = 'very-subtle' | 'normal' | 'direct';
 
 export type OngoingUserInvestigation = {
 	caseId: string;

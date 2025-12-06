@@ -1,0 +1,1 @@
+ALTER TABLE `chat_message` ADD `type` text DEFAULT 'normal' NOT NULL;
