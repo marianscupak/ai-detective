@@ -3,10 +3,11 @@
 import { headers } from 'next/headers';
 
 import { auth } from '@/lib/auth';
-import { type DetectiveCaseListItem } from '@/types/case';
+import { CaseLeaderboardEntry, type DetectiveCaseListItem } from '@/types/case';
 import {
 	dbGetAllCaseThemes,
 	dbGetAllDetectiveCasesWithStatus,
+	dbGetLeaderboardForCase,
 	dbUserHasCompletedCase,
 	getCaseById
 } from '@/lib/database/game';
@@ -44,4 +45,13 @@ export const getAllDetectiveCasesWithStatus = async (): Promise<
 > => {
 	const userId = await requireAuth();
 	return await dbGetAllDetectiveCasesWithStatus(userId);
+};
+
+export const getLeaderboardForCase = async (
+	caseId: string
+): Promise<CaseLeaderboardEntry[]> => {
+	await requireAuth();
+
+	const result = await dbGetLeaderboardForCase(caseId);
+	return result;
 };

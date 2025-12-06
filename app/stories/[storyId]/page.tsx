@@ -3,10 +3,12 @@ import {
 	StoryHeader,
 	StoryEvidenceSection,
 	StoryCharactersSection,
-	StoryCaseDetailsSection
+	StoryCaseDetailsSection,
+	StoryLeaderboardSection
 } from '@/components/story-sections';
 import {
 	getDetectiveCaseById,
+	getLeaderboardForCase,
 	userHasCompletedCase
 } from '@/server-actions/case';
 
@@ -18,6 +20,7 @@ const StoryPage = async ({ params }: StoryPageProps) => {
 	const { storyId } = await params;
 	const story = await getDetectiveCaseById(storyId);
 	const isSolvedForUser = await userHasCompletedCase(storyId);
+	const leaderboard = await getLeaderboardForCase(storyId);
 
 	return (
 		<div className="relative flex">
@@ -26,7 +29,8 @@ const StoryPage = async ({ params }: StoryPageProps) => {
 					{ id: 'summary-section', label: 'Summary' },
 					{ id: 'case-details-section', label: 'Case Details' },
 					{ id: 'evidence-section', label: 'Evidence' },
-					{ id: 'characters-section', label: 'Characters' }
+					{ id: 'characters-section', label: 'Characters' },
+					{ id: 'leaderboard-section', label: 'Leaderboard' }
 				]}
 			/>
 
@@ -35,6 +39,7 @@ const StoryPage = async ({ params }: StoryPageProps) => {
 				<StoryCaseDetailsSection story={story} />
 				<StoryEvidenceSection story={story} />
 				<StoryCharactersSection story={story} />
+				<StoryLeaderboardSection entries={leaderboard} />
 
 				<div className="mt-10 flex justify-end">
 					<a

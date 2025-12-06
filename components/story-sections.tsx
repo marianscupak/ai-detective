@@ -2,7 +2,13 @@
 
 import { CheckCircle, CircleDashed, Clock } from 'lucide-react';
 
-import { type Character, type DetectiveCase } from '@/types/case';
+import {
+	type CaseLeaderboardEntry,
+	type Character,
+	type DetectiveCase
+} from '@/types/case';
+
+import { Leaderboard } from './leaderboard';
 
 export const StoryHeader = ({
 	story,
@@ -123,9 +129,26 @@ export const StoryCaseDetailsSection = ({
 	</section>
 );
 
+export const StoryLeaderboardSection = ({
+	entries
+}: {
+	entries: CaseLeaderboardEntry[];
+}) => (
+	<section
+		id="leaderboard-section"
+		className="mb-12 scroll-mt-24 rounded-xl bg-white p-6 shadow"
+	>
+		<h2 className="mb-4 text-2xl font-semibold text-gray-900">
+			Top Detectives
+		</h2>
+
+		<Leaderboard entries={entries} />
+	</section>
+);
 export default {
 	StoryHeader,
 	StoryEvidenceSection,
 	StoryCharactersSection,
-	StoryCaseDetailsSection
+	StoryCaseDetailsSection,
+	StoryLeaderboardSection
 };

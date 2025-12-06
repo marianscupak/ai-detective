@@ -1,4 +1,4 @@
-import { and, asc, count, eq, or } from 'drizzle-orm';
+import { and, asc, count, eq, or, sql } from 'drizzle-orm';
 
 import {
 	type DetectiveCaseBaseView,
@@ -18,8 +18,62 @@ import {
 	gameSession,
 	chatMessage
 } from '@/db/schema/game-schema';
+import { user } from '@/db/schema/auth-schema';
 
 // ---------- CASES ----------
+
+export const dbGetLeaderboardForCase = async (caseId: string) => {
+	const sessions = await db
+		.select({
+			sessionId: gameSession.id,
+			userId: gameSession.userId,
+			userName: user.name,
+			startedAt: gameSession.startedAt
+		})
+		.from(gameSession)
+		.innerJoin(user, eq(user.id, gameSession.userId))
+		.where(
+			and(eq(gameSession.caseId, caseId), eq(gameSession.status, 'completed'))
+		);
+
+	const firstSessions = Object.values(
+		sessions.reduce(
+			(acc, s) => {
+				if (!acc[s.userId] || s.startedAt < acc[s.userId].startedAt) {
+					acc[s.userId] = s;
+				}
+				return acc;
+			},
+			{} as Record<string, (typeof sessions)[number]>
+		)
+	);
+
+	const results = await Promise.all(
+		firstSessions.map(async session => {
+			const [{ count }] = await db
+				.select({
+					count: sql<number>`COUNT(${chatMessage.id})`
+				})
+				.from(chatMessage)
+				.where(
+					and(
+						eq(chatMessage.gameSessionId, session.sessionId),
+						eq(chatMessage.role, 'player')
+					)
+				);
+
+			return {
+				userId: session.userId,
+				userName: session.userName,
+				caseId,
+				messageCount: count
+			};
+		})
+	);
+
+	results.sort((a, b) => a.messageCount - b.messageCount);
+	return results;
+};
 
 export const dbGetAllDetectiveCases = async (): Promise<
 	DetectiveCaseBaseView[]
