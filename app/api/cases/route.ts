@@ -22,7 +22,8 @@ export const POST = async (req: Request) => {
 	const authorId = session.user.id;
 	const body = (await req.json()) as DetectiveCase;
 
-	const caseId = `${body.title}-${Date.now()}`;
+	const sanitizedTitle = body.title.replace(/[^a-zA-Z0-9]/g, '-');
+	const caseId = `${sanitizedTitle}-${Date.now()}`;
 	console.log(caseId, body.id, `title-${Date.now()}`);
 
 	const playerDbId = `${caseId}-player`;
