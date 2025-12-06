@@ -1,6 +1,6 @@
 import { and, asc, count, eq, or } from 'drizzle-orm';
 
-import { type DetectiveCase } from '@/types/case';
+import { type DetectiveCaseBaseView, type DetectiveCase } from '@/types/case';
 import {
 	type ChatMessage,
 	type GameSession,
@@ -16,6 +16,20 @@ import {
 } from '@/db/schema/game-schema';
 
 // ---------- CASES ----------
+
+export const dbGetAllDetectiveCases = async (): Promise<
+	DetectiveCaseBaseView[]
+> => {
+	return await db.select().from(detectiveCase);
+};
+
+export const dbGetAllCaseThemes = async (): Promise<string[]> => {
+	const rows = await db
+		.select({ theme: detectiveCase.theme })
+		.from(detectiveCase);
+
+	return Array.from(new Set(rows.map(r => r.theme)));
+};
 
 export const getOngoingUserInvestigations = async (userId: string) => {
 	return await db
