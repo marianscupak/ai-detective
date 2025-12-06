@@ -1,6 +1,10 @@
 import { and, asc, count, eq, or } from 'drizzle-orm';
 
-import { type DetectiveCaseBaseView, type DetectiveCase } from '@/types/case';
+import {
+	type DetectiveCaseBaseView,
+	type DetectiveCase,
+	type DetectiveCaseListItem
+} from '@/types/case';
 import {
 	type ChatMessage,
 	type GameSession,
@@ -21,6 +25,26 @@ export const dbGetAllDetectiveCases = async (): Promise<
 	DetectiveCaseBaseView[]
 > => {
 	return await db.select().from(detectiveCase);
+};
+
+export const dbGetAllDetectiveCasesWithStatus = async (
+	userId: string
+): Promise<DetectiveCaseListItem[]> => {
+	const cases = await dbGetAllDetectiveCases();
+
+	const solvedSessions = await db
+		.select({ caseId: gameSession.caseId })
+		.from(gameSession)
+		.where(
+			and(eq(gameSession.userId, userId), eq(gameSession.status, 'completed'))
+		);
+
+	const solvedCaseIds = new Set(solvedSessions.map(s => s.caseId));
+
+	return cases.map(c => ({
+		...c,
+		isSolvedForUser: solvedCaseIds.has(c.id)
+	}));
 };
 
 export const dbGetAllCaseThemes = async (): Promise<string[]> => {
@@ -151,6 +175,25 @@ export const getCaseById = async (
 };
 
 // ---------- GAME SESSIONS ----------
+
+export const dbUserHasCompletedCase = async (
+	userId: string,
+	caseId: string
+): Promise<boolean> => {
+	const result = await db
+		.select({ id: gameSession.id })
+		.from(gameSession)
+		.where(
+			and(
+				eq(gameSession.userId, userId),
+				eq(gameSession.caseId, caseId),
+				eq(gameSession.status, 'completed')
+			)
+		)
+		.limit(1);
+
+	return result.length > 0;
+};
 
 export const findOrCreateGameSession = async (
 	userId: string,

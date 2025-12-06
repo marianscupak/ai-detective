@@ -2,10 +2,10 @@
 
 import { useState, useMemo } from 'react';
 
-import { type DetectiveCaseBaseView } from '@/types/case';
+import { type DetectiveCaseListItem } from '@/types/case';
 import { type FilterOptions } from '@/components/filter-bar';
 
-export const useStoriesFilter = (stories: DetectiveCaseBaseView[]) => {
+export const useStoriesFilter = (stories: DetectiveCaseListItem[]) => {
 	const [filters, setFilters] = useState<FilterOptions>({
 		solved: 'all',
 		date: 'newest',
@@ -37,6 +37,12 @@ export const useStoriesFilter = (stories: DetectiveCaseBaseView[]) => {
 			result = result.filter(
 				story => story.theme.toLowerCase() === selectedTheme
 			);
+		}
+
+		if (filters.solved === 'solved') {
+			result = result.filter(story => story.isSolvedForUser);
+		} else if (filters.solved === 'unsolved') {
+			result = result.filter(story => !story.isSolvedForUser);
 		}
 
 		result.sort((a, b) => {

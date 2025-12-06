@@ -5,7 +5,10 @@ import {
 	StoryCharactersSection,
 	StoryCaseDetailsSection
 } from '@/components/story-sections';
-import { getDetectiveCaseById } from '@/server-actions/case';
+import {
+	getDetectiveCaseById,
+	userHasCompletedCase
+} from '@/server-actions/case';
 
 type StoryPageProps = {
 	params: { storyId: string };
@@ -14,6 +17,7 @@ type StoryPageProps = {
 const StoryPage = async ({ params }: StoryPageProps) => {
 	const { storyId } = await params;
 	const story = await getDetectiveCaseById(storyId);
+	const isSolvedForUser = await userHasCompletedCase(storyId);
 
 	return (
 		<div className="relative flex">
@@ -27,7 +31,7 @@ const StoryPage = async ({ params }: StoryPageProps) => {
 			/>
 
 			<main className="mx-auto max-w-4xl flex-1 px-8 py-12 md:ml-64">
-				<StoryHeader story={story} />
+				<StoryHeader story={story} isSolvedForUser={isSolvedForUser} />
 				<StoryCaseDetailsSection story={story} />
 				<StoryEvidenceSection story={story} />
 				<StoryCharactersSection story={story} />

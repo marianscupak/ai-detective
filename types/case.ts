@@ -94,3 +94,7 @@ export type DetectiveCaseBaseView = {
 
 	notesForAI?: string | null; // Extra instructions for the AI (optional)
 };
+
+export type DetectiveCaseListItem = DetectiveCaseBaseView & {
+	isSolvedForUser: boolean;
+};

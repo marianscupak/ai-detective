@@ -3,10 +3,11 @@
 import { headers } from 'next/headers';
 
 import { auth } from '@/lib/auth';
-import { type DetectiveCaseBaseView } from '@/types/case';
+import { type DetectiveCaseListItem } from '@/types/case';
 import {
 	dbGetAllCaseThemes,
-	dbGetAllDetectiveCases,
+	dbGetAllDetectiveCasesWithStatus,
+	dbUserHasCompletedCase,
 	getCaseById
 } from '@/lib/database/game';
 
@@ -17,13 +18,6 @@ const requireAuth = async () => {
 
 	if (!session?.user?.id) throw new Error('Unauthorized');
 	return session.user.id;
-};
-
-export const getAllDetectiveCases = async (): Promise<
-	DetectiveCaseBaseView[]
-> => {
-	await requireAuth();
-	return await dbGetAllDetectiveCases();
 };
 
 export const getDetectiveCaseById = async (caseId: string) => {
@@ -38,4 +32,16 @@ export const getDetectiveCaseById = async (caseId: string) => {
 export const getAllCaseThemes = async (): Promise<string[]> => {
 	await requireAuth();
 	return await dbGetAllCaseThemes();
+};
+
+export const userHasCompletedCase = async (caseId: string) => {
+	const userId = await requireAuth();
+	return await dbUserHasCompletedCase(userId, caseId);
+};
+
+export const getAllDetectiveCasesWithStatus = async (): Promise<
+	DetectiveCaseListItem[]
+> => {
+	const userId = await requireAuth();
+	return await dbGetAllDetectiveCasesWithStatus(userId);
 };

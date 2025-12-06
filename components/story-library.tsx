@@ -3,10 +3,10 @@
 import { StoryCard } from '@/components/story-card';
 import { FilterBar } from '@/components/filter-bar';
 import { useStoriesFilter } from '@/hooks/useStoriesFilter';
-import { type DetectiveCaseBaseView } from '@/types/case';
+import { type DetectiveCaseListItem } from '@/types/case';
 
 type StoryLibraryProps = {
-	stories: DetectiveCaseBaseView[];
+	stories: DetectiveCaseListItem[];
 	themes: string[];
 };
 

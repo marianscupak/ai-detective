@@ -1,16 +1,16 @@
 import { CheckCircle, CircleDashed, Clock } from 'lucide-react';
 import Link from 'next/link';
 
-import { type StoryCase } from '@/types/case';
+import { type DetectiveCaseListItem } from '@/types/case';
 
 type StoryProps = {
-	story: StoryCase;
+	story: DetectiveCaseListItem;
 };
+
 export const StoryCard = ({ story }: StoryProps) => {
-	const { id, title, summary, createdAt } = story;
+	const { id, title, summary, createdAt, isSolvedForUser } = story;
 
 	const formattedDate = new Date(createdAt).toLocaleDateString();
-	const solved = false;
 
 	return (
 		<div className="flex flex-col justify-between rounded-2xl border border-gray-200 bg-white p-6 shadow">
@@ -20,7 +20,7 @@ export const StoryCard = ({ story }: StoryProps) => {
 					<span>{formattedDate}</span>
 				</div>
 
-				{solved ? (
+				{isSolvedForUser ? (
 					<div className="flex items-center gap-1 rounded-full border border-blue-700 px-3 py-1 text-sm font-medium text-blue-700">
 						<CheckCircle className="h-4 w-4" />
 						Solved

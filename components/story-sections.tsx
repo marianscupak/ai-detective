@@ -1,13 +1,45 @@
 'use client';
 
+import { CheckCircle, CircleDashed, Clock } from 'lucide-react';
+
 import { type Character, type DetectiveCase } from '@/types/case';
 
-export const StoryHeader = ({ story }: { story: DetectiveCase }) => (
-	<header id="summary-section" className="mb-12 scroll-mt-24">
-		<h1 className="text-4xl font-bold text-gray-900">{story.title}</h1>
-		<p className="mt-4 text-lg text-gray-700">{story.summary}</p>
-	</header>
-);
+export const StoryHeader = ({
+	story,
+	isSolvedForUser
+}: {
+	story: DetectiveCase;
+	isSolvedForUser: boolean;
+}) => {
+	const formattedDate = new Date(story.createdAt).toLocaleDateString();
+
+	return (
+		<header id="summary-section" className="mb-10 scroll-mt-4 border-b pb-6">
+			<div className="flex items-center justify-between">
+				<div className="flex items-center gap-2 text-sm text-gray-500">
+					<Clock className="h-4 w-4 text-gray-400" />
+					<span>{formattedDate}</span>
+				</div>
+
+				{isSolvedForUser ? (
+					<div className="flex items-center gap-1 rounded-full border border-blue-700 px-3 py-1 text-sm font-medium text-blue-700">
+						<CheckCircle className="h-4 w-4" />
+						Solved
+					</div>
+				) : (
+					<div className="flex items-center gap-1 rounded-full border border-gray-400 px-3 py-1 text-sm font-medium text-gray-600">
+						<CircleDashed className="h-4 w-4" />
+						Unsolved
+					</div>
+				)}
+			</div>
+
+			<h1 className="mt-4 text-4xl font-bold text-gray-900">{story.title}</h1>
+
+			<p className="mt-4 max-w-2xl text-gray-700">{story.summary}</p>
+		</header>
+	);
+};
 
 export const StoryEvidenceSection = ({ story }: { story: DetectiveCase }) => (
 	<section
@@ -86,10 +118,6 @@ export const StoryCaseDetailsSection = ({
 			</li>
 			<li>
 				<strong>Theme:</strong> {story.theme}
-			</li>
-			<li>
-				<strong>Created:</strong>{' '}
-				{new Date(story.createdAt).toLocaleDateString()}
 			</li>
 		</ul>
 	</section>
