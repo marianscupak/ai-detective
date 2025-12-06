@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1764523559260,
+      "tag": "0000_fixed_night_thrasher",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1764613863304,
+      "tag": "0001_icy_gravity",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1764629127233,
+      "tag": "0002_mute_mattie_franklin",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1764706038127,
+      "tag": "0003_cultured_nightmare",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1764706720619,
+      "tag": "0004_blue_ultimatum",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1764954310821,
+      "tag": "0005_unique_iron_monger",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1765023888644,
+      "tag": "0006_real_senator_kelly",
+      "breakpoints": true
+    }
+  ]
+}

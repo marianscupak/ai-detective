@@ -13,25 +13,24 @@ import {
 } from '@/lib/database/game';
 import { auth } from '@/lib/auth';
 import { type DetectiveCase } from '@/types/case';
-import { aiResponseSchema, type ChatMessage } from '@/types/game';
+import {
+	aiResponseSchema,
+	type ChatMessage,
+	type HintFocus,
+	type HintSubtlety
+} from '@/types/game';
 import { callGemini } from '@/lib/gemini';
+import {
+	handleAbandonGameAchievements,
+	handleCompleteGameAchievements,
+	handleSendMessageAchievements
+} from '@/lib/achievements';
 
-const buildPrompt = (
-	caseData: DetectiveCase,
-	history: ChatMessage[],
-	previousProgress = 0
-): string => {
-	const chatHistory = history
-		.map(
-			msg =>
-				`${msg.role === 'player' ? 'Player' : 'Game Master'}: ${msg.content}`
-		)
-		.join('\n');
+/* -------------------------------------------------------------------------- */
+/* Shared helpers                                                             */
+/* -------------------------------------------------------------------------- */
 
-	const lastPlayerMessage =
-		[...history].reverse().find(msg => msg.role === 'player')?.content ??
-		'(No player message yet.)';
-
+const buildGameContext = (caseData: DetectiveCase) => {
 	const suspectsText = caseData.characters.suspects
 		.map(s => `- [${s.id}] ${s.name}: ${s.description}`)
 		.join('\n');
@@ -103,6 +102,39 @@ ${authorNotes}
 `.trim()
 		: '';
 
+	return {
+		publicInfo,
+		secretInfo,
+		extraNotesSection,
+		culpritId,
+		motive,
+		method
+	};
+};
+
+/* -------------------------------------------------------------------------- */
+/* Normal chat prompt                                                         */
+/* -------------------------------------------------------------------------- */
+
+const buildPrompt = (
+	caseData: DetectiveCase,
+	history: ChatMessage[],
+	previousProgress = 0
+): string => {
+	const { publicInfo, secretInfo, extraNotesSection, culpritId } =
+		buildGameContext(caseData);
+
+	const chatHistory = history
+		.map(
+			msg =>
+				`${msg.role === 'player' ? 'Player' : 'Game Master'}: ${msg.content}`
+		)
+		.join('\n');
+
+	const lastPlayerMessage =
+		[...history].reverse().find(msg => msg.role === 'player')?.content ??
+		'(No player message yet.)';
+
 	return `
 You are "The Game Master" in an interactive detective mystery game played in a chat.
 
@@ -158,7 +190,7 @@ HOW TO CALCULATE SCORES:
    - It should only ever increase or stay the same across the whole game.
    - The previous progress value up to this point is: ${previousProgress}.
    - Your new "progress" MUST be greater than or equal to ${previousProgress}.
-   - The progress score MUST NEVER be equal to 1.0 unless the player has solved the case and you set \`isSolved: true\` in your response.
+   - The progress score MUST NEVER be equal to 1.0 unless the player has solved the case and you set "isSolved": true in your response.
    - 0.0: The game has just started.
    - 0.25: Player has gathered some initial clues.
    - 0.50: Player has identified a key piece of evidence and is questioning the right people.
@@ -170,12 +202,12 @@ HOW TO CALCULATE SCORES:
    - Example: "Player correctly identified the significance of the ink stain, which is a major breakthrough. Progress increases significantly."
 
 4) "isSolved":
-   - Set this to \`true\` ONLY if the player's latest message is a DIRECT and CORRECT accusation.
+   - Set this to true ONLY if the player's latest message is a DIRECT and CORRECT accusation.
 	 - The accusation MUST correctly identify:
-        1. The Culprit (\`${culpritId}\`)
+        1. The Culprit ("${culpritId}")
         2. The Motive
         3. The Method
-   - If the accusation is correct, your 'narrativeResponse' should be a confirmation, and you MUST set \`progress: 1.0\` and \`isSolved: true\`.
+   - If the accusation is correct, your "narrativeResponse" should be a confirmation, and you MUST set "progress": 1.0 and "isSolved": true.
    - If the accusation is incorrect or incomplete, DO NOT include this flag. But try to guide the player in the right direction.
 
 GAME DATA (PLAYER-FACING IF YOU CHOOSE TO REVEAL IT IN NARRATIVE FORM):
@@ -196,6 +228,129 @@ Analyze the player's latest message in the context of the whole conversation and
 Then produce ONLY the JSON object described above, with no extra text before or after.
 `.trim();
 };
+
+/* -------------------------------------------------------------------------- */
+/* Hint prompt                                                                */
+/* -------------------------------------------------------------------------- */
+
+const buildHintPrompt = (
+	caseData: DetectiveCase,
+	history: ChatMessage[],
+	previousProgress = 0,
+	options?: {
+		message?: string;
+		focus?: HintFocus;
+		subtlety?: HintSubtlety;
+	}
+): string => {
+	const { publicInfo, secretInfo, extraNotesSection } =
+		buildGameContext(caseData);
+
+	const chatHistory = history
+		.map(
+			msg =>
+				`${msg.role === 'player' ? 'Player' : 'Game Master'}: ${msg.content}`
+		)
+		.join('\n');
+
+	const lastPlayerMessage =
+		[...history].reverse().find(msg => msg.role === 'player')?.content ??
+		'(No player message yet.)';
+
+	const focusDescription = (() => {
+		switch (options?.focus) {
+			case 'next-step':
+				return 'Give guidance on what concrete action the player should take next (who to talk to, where to go, what to examine).';
+			case 'evidence':
+				return 'Give guidance about which piece of evidence to focus on, re-examine, or connect.';
+			case 'suspect':
+				return 'Give guidance about which suspect to question, reconsider, or compare against others.';
+			case 'motive':
+				return 'Give guidance related to motives and why the culprit would commit the crime.';
+			case 'method':
+				return 'Give guidance related to how the crime was committed (method, opportunity, logistics).';
+			case 'general':
+			default:
+				return 'Give general guidance that nudges the player toward the right track without focusing on a single aspect.';
+		}
+	})();
+
+	const subtletyDescription = (() => {
+		switch (options?.subtlety) {
+			case 'very-subtle':
+				return 'The hint should be very indirect: light nudges and questions, no explicit statements.';
+			case 'direct':
+				return 'The hint may be fairly direct and explicit, but MUST still avoid outright revealing the culprit, exact method, or fully spoiling the solution.';
+			case 'normal':
+			default:
+				return 'The hint should be moderately direct: clear enough to help, but still leave room for the player to think.';
+		}
+	})();
+
+	return `
+You are "The Game Master" in an interactive detective mystery game.
+
+IMPORTANT: HINT MODE IS ACTIVE.
+
+The player is explicitly requesting a hint.
+
+PLAYER'S FREE-FORM HINT REQUEST (if any):
+${options?.message ?? "The player didn't specify what kind of hint they wanted."}
+
+HINT PARAMETERS (STRUCTURED):
+- Focus: ${options?.focus ?? 'general'}
+  ${focusDescription}
+- Subtlety: ${options?.subtlety ?? 'normal'}
+  ${subtletyDescription}
+
+In this mode:
+- DO NOT continue the narrative scene or advance time.
+- DO NOT describe new actions or events; only suggest what the player could think about or do next.
+- DO NOT reveal the culprit, motive, or method directly.
+- Provide 1–3 hints that become progressively clearer.
+- Start with a gentle nudge ("Maybe check X again..."), then, if you add more, make them slightly more explicit.
+- Keep hints focused on what the player should *do next* or *re-examine*.
+- The hints should relate to the player's CURRENT understanding and the conversation so far.
+
+RESPONSE FORMAT (VERY IMPORTANT):
+You MUST respond with a single, valid JSON object and NOTHING ELSE. No markdown, no backticks, no additional text.
+The JSON must have ALL of these keys:
+{
+  "narrativeResponse": "Your hint message to the player.",
+  "relevance": 0.0,
+  "progress": 0.0,
+  "reasoning": "Short out-of-character explanation for the system (1–3 sentences)."
+}
+
+- "narrativeResponse": your hint text (you may include multiple short hints in one message).
+- "relevance": how close the PLAYER's CURRENT ideas/messages are to the truth (0.0–1.0).
+- "progress": the PLAYER's OVERALL PROGRESS in solving the case (0.0–1.0).
+  - It MUST be greater than or equal to ${previousProgress}.
+  - In HINT MODE you should normally keep progress the same unless the hint reflects a significant understanding the player already demonstrated.
+- DO NOT include "isSolved" in HINT MODE.
+
+GAME DATA (PLAYER-FACING IF YOU CHOOSE TO REVEAL IT IN HINT FORM):
+${publicInfo}
+
+INTERNAL, SECRET INFORMATION (FOR AI ONLY – NEVER REVEAL DIRECTLY TO THE PLAYER):
+${secretInfo}
+
+${extraNotesSection}
+
+CONVERSATION SO FAR:
+${chatHistory || '(No prior messages. Start from the basic premise.)'}
+
+PLAYER'S LATEST MESSAGE (primary basis for relevance/progress evaluation):
+${lastPlayerMessage}
+
+Analyze the player's situation and requested type of hint.
+Then produce ONLY the JSON object described above, with no extra text before or after.
+`.trim();
+};
+
+/* -------------------------------------------------------------------------- */
+/* Actions                                                                    */
+/* -------------------------------------------------------------------------- */
 
 export const sendChatMessage = async (
 	caseId: string,
@@ -225,13 +380,17 @@ export const sendChatMessage = async (
 	const chatHistory = await getChatHistory(gameSessionId);
 	const gameSession = await getGameSessionById(gameSessionId);
 
-	const prompt = buildPrompt(caseData, chatHistory, gameSession?.progress ?? 0);
+	const previousProgress = gameSession?.progress ?? 0;
+
+	const prompt = buildPrompt(caseData, chatHistory, previousProgress);
 	const result = await callGemini(prompt);
 
 	try {
 		const data = JSON.parse(result!);
-
 		const parsedData = aiResponseSchema.parse(data);
+
+		const rawProgress = parsedData.progress ?? previousProgress;
+		const newProgress = Math.max(previousProgress, rawProgress);
 
 		const savedMessage = await saveNewMessage({
 			gameSessionId,
@@ -240,11 +399,13 @@ export const sendChatMessage = async (
 			relevance: parsedData.relevance,
 			reasoning: parsedData.reasoning
 		});
+		await handleSendMessageAchievements(session.user.id, gameSessionId);
 
-		await updateGameSessionProgress(gameSessionId, parsedData.progress);
+		await updateGameSessionProgress(gameSessionId, newProgress);
 
 		if (parsedData.isSolved) {
 			await updateGameSessionStatus(gameSessionId, 'completed');
+			await handleCompleteGameAchievements(session.user.id, gameSessionId);
 		}
 
 		return savedMessage;
@@ -319,12 +480,93 @@ export const abandonGameSession = async (gameSessionId: string) => {
 		);
 	}
 
+	const gameSession = await getGameSessionById(gameSessionId);
+
+	if (gameSession?.userId !== session.user.id) {
+		throw new Error(
+			'Forbidden: Game session does not exist or belongs to another user.'
+		);
+	}
+
 	try {
 		await updateGameSessionStatus(gameSessionId, 'abandoned');
+		await handleAbandonGameAchievements(session.user.id, gameSession);
 
 		return { success: true };
 	} catch (error) {
 		console.error('Failed to abandon game session:', error);
 		throw new Error('Could not abandon the session. Please try again.');
+	}
+};
+
+export const requestHint = async (
+	gameSessionId: string,
+	options?: {
+		message?: string;
+		focus?: HintFocus;
+		subtlety?: HintSubtlety;
+	}
+) => {
+	const session = await auth.api.getSession({
+		headers: await headers()
+	});
+
+	if (!session?.user?.id) {
+		throw new Error(
+			'Unauthorized: You must be logged in to perform this action.'
+		);
+	}
+
+	try {
+		const gameSession = await getGameSessionById(gameSessionId);
+		if (!gameSession) {
+			throw new Error('Game session not found.');
+		}
+
+		const caseDetails = await getCaseById(gameSession.caseId);
+		if (!caseDetails) {
+			throw new Error('Case not found.');
+		}
+
+		const chatHistory = await getChatHistory(gameSessionId);
+		const previousProgress = gameSession.progress ?? 0;
+
+		const prompt = buildHintPrompt(
+			caseDetails,
+			chatHistory,
+			previousProgress,
+			options
+		);
+
+		const result = await callGemini(prompt);
+		const data = JSON.parse(result!);
+		const parsedData = aiResponseSchema.parse(data);
+
+		const rawProgress = parsedData.progress ?? previousProgress;
+		const clampedProgress = Math.min(rawProgress, 0.99);
+		const newProgress = Math.max(previousProgress, clampedProgress);
+
+		const hintRequestMessage = await saveNewMessage({
+			gameSessionId,
+			role: 'player',
+			content: options?.message ?? 'Hint requested.',
+			type: 'hintRequest'
+		});
+
+		const hintResponseMessage = await saveNewMessage({
+			gameSessionId,
+			role: 'gameMaster',
+			content: parsedData.narrativeResponse,
+			relevance: parsedData.relevance,
+			reasoning: parsedData.reasoning,
+			type: 'hintResponse'
+		});
+
+		await updateGameSessionProgress(gameSessionId, newProgress);
+
+		return { hintRequestMessage, hintResponseMessage };
+	} catch (e) {
+		console.error('Failed to request hint:', e);
+		throw new Error('Could not request hint. Please try again.');
 	}
 };

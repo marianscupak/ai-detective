@@ -7,7 +7,9 @@ import {
 	useState,
 	useTransition,
 	type FormEvent,
-	useCallback
+	useCallback,
+	type Dispatch,
+	type SetStateAction
 } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -19,7 +21,6 @@ import {
 	CardTitle,
 	CardDescription
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { type DetectiveCase } from '@/types/case';
 import { type ChatMessage, type GameSession } from '@/types/game';
@@ -28,22 +29,24 @@ import { ChatMessageBubble } from '@/components/chat/chat-message-bubble';
 import { AiMessageLoadingBubble } from '@/components/chat/ai-message-loading-bubble';
 import { GameConclusion } from '@/components/chat/game-conclusion';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Textarea } from '@/components/ui/textarea';
 
 type ChatRoomProps = {
 	initialCaseDetails: DetectiveCase;
 	initialGameSession: GameSession;
-	initialMessages: ChatMessage[];
+	messages: ChatMessage[];
+	setMessages: Dispatch<SetStateAction<ChatMessage[]>>;
 };
 
-export const ChatRoom = ({
+export const Chat = ({
 	initialCaseDetails,
 	initialGameSession,
-	initialMessages
+	messages,
+	setMessages
 }: ChatRoomProps) => {
-	const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
 	const [input, setInput] = useState('');
 	const [isPending, startTransition] = useTransition();
-	const inputRef = useRef<HTMLInputElement | null>(null);
+	const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
 	const [isGameFinished, setIsGameFinished] = useState(
 		initialGameSession.status === 'completed'
@@ -88,6 +91,7 @@ export const ChatRoom = ({
 				role: 'player',
 				content,
 				gameSessionId: initialGameSession.id,
+				type: 'normal',
 				createdAt: new Date()
 			}
 		]);
@@ -110,6 +114,7 @@ export const ChatRoom = ({
 						role: 'gameMaster',
 						content: 'An error occurred. Please try again.',
 						gameSessionId: initialGameSession.id,
+						type: 'normal',
 						createdAt: new Date()
 					}
 				]);
@@ -184,7 +189,7 @@ export const ChatRoom = ({
 						onSubmit={handleSendMessage}
 						className="flex w-full items-center space-x-2"
 					>
-						<Input
+						<Textarea
 							ref={inputRef}
 							placeholder={
 								isPending ? 'The game master is thinking…' : 'Type your theory…'

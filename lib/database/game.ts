@@ -361,12 +361,29 @@ export const getChatHistory = async (
 		content: row.content,
 		createdAt: new Date(row.createdAt),
 		relevance: row.relevance,
-		reasoning: row.reasoning
+		reasoning: row.reasoning,
+		type: row.type as ChatMessage['type']
 	}));
 };
 
+export const getChatHistoryCount = async (gameSessionId: string) => {
+	const [messages] = await db
+		.select({ count: count(chatMessage.id) })
+		.from(chatMessage)
+		.where(
+			and(
+				eq(chatMessage.gameSessionId, gameSessionId),
+				eq(chatMessage.role, 'player')
+			)
+		);
+
+	return messages.count;
+};
+
 export const saveNewMessage = async (
-	message: Omit<ChatMessage, 'id' | 'createdAt'>
+	message: Omit<ChatMessage, 'id' | 'createdAt' | 'type'> & {
+		type?: ChatMessage['type'];
+	}
 ): Promise<ChatMessage> => {
 	const id = `msg_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 	const now = new Date();
@@ -378,6 +395,7 @@ export const saveNewMessage = async (
 		content: message.content,
 		relevance: message.relevance,
 		reasoning: message.reasoning,
+		type: message.type ?? 'normal',
 		createdAt: now
 	});
 
@@ -388,6 +406,7 @@ export const saveNewMessage = async (
 		content: message.content,
 		reasoning: message.reasoning,
 		relevance: message.relevance,
+		type: message.type ?? 'normal',
 		createdAt: now
 	};
 };
