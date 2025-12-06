@@ -72,21 +72,18 @@ export const getDetectiveCaseById = async (
 			player = {
 				id: ch.id,
 				name: ch.name,
-				description: ch.description,
-				role: 'player'
+				description: ch.description
 			};
 		} else if (ch.role === 'victim') {
 			victim = {
 				name: ch.name,
-				description: ch.description,
-				role: 'victim'
+				description: ch.description
 			};
 		} else {
 			suspects.push({
 				id: ch.id,
 				name: ch.name,
-				description: ch.description,
-				role: ch.role
+				description: ch.description
 			});
 		}
 	}

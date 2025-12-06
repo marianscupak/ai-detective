@@ -9,7 +9,6 @@ export type Character = {
 	id: string; // Unique ID to internally reference this character (e.g., 'char-julian').
 	name: string; // The character's full name (e.g., "Julian Croft").
 	description: string; // A brief on their personality, appearance, and connection to the case.
-	role: string; // Character's role in a story
 };
 
 /**
@@ -18,7 +17,6 @@ export type Character = {
 export type VictimOrTarget = {
 	name: string; // Name of the person or item (e.g., "Arthur Blackwood", "The Serpent's Eye Diamond").
 	description: string; // Details about who they were or what it is.
-	role: string; // Character's role in a story
 };
 
 /**
