@@ -19,14 +19,14 @@ import {
 	type Evidence
 } from '@/types/case';
 import { createCaseSchema, type CreateCaseFormValues } from '@/lib/schema/case';
-import { SectionCard } from '@/components/create-story/SectionCard';
-import { OverviewSection } from '@/components/create-story/sections/OverviewSection';
-import { SettingSection } from '@/components/create-story/sections/SettingSection';
-import { CharactersSection } from '@/components/create-story/sections/CharactersSection';
-import { SuspectsSection } from '@/components/create-story/sections/SuspectsSection';
-import { EvidenceSection } from '@/components/create-story/sections/EvidenceSection';
-import { SolutionSection } from '@/components/create-story/sections/SolutionSection';
-import { NotesSection } from '@/components/create-story/sections/NotesSection';
+import { SectionCard } from '@/components/create-case/SectionCard';
+import { OverviewSection } from '@/components/create-case/sections/OverviewSection';
+import { SettingSection } from '@/components/create-case/sections/SettingSection';
+import { CharactersSection } from '@/components/create-case/sections/CharactersSection';
+import { SuspectsSection } from '@/components/create-case/sections/SuspectsSection';
+import { EvidenceSection } from '@/components/create-case/sections/EvidenceSection';
+import { SolutionSection } from '@/components/create-case/sections/SolutionSection';
+import { NotesSection } from '@/components/create-case/sections/NotesSection';
 
 const CreateCasePage: React.FC = () => {
 	const router = useRouter();

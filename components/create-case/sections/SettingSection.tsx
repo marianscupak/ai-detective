@@ -4,9 +4,9 @@ import React from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 
 import type { CreateCaseFormValues } from '@/lib/schema/case';
-import { SectionCard } from '@/components/create-story/SectionCard';
-import { FormField } from '@/components/create-story/FormField';
-import { CaseTextarea } from '@/components/create-story/CaseTextarea';
+import { SectionCard } from '@/components/create-case/SectionCard';
+import { FormField } from '@/components/create-case/FormField';
+import { CaseTextarea } from '@/components/create-case/CaseTextarea';
 import { Input } from '@/components/ui/input';
 
 type SettingSectionProps = {
