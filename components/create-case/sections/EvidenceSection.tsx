@@ -37,62 +37,73 @@ export const EvidenceSection: React.FC<EvidenceSectionProps> = ({ form }) => {
 
 	return (
 		<SectionCard title="Evidence">
-			{typeof errors.evidences === 'object' &&
-				!Array.isArray(errors.evidences) &&
-				errors.evidences && (
-					<p className="mb-2 text-xs text-red-500">
-						{(errors.evidences as any).message}
+			<div className="grid gap-4 md:grid-cols-3">
+				<div className="md:col-span-1">
+					<h2 className="text-sm font-semibold">Suspects</h2>
+					<p className="text-muted-foreground text-xs">
+						Add all important characters in the Case.
 					</p>
-				)}
+					{typeof errors.evidences === 'object' &&
+						!Array.isArray(errors.evidences) &&
+						errors.evidences && (
+							<p className="mb-2 text-xs text-red-500">
+								{(errors.evidences as any).message}
+							</p>
+						)}
+				</div>
+				<div className="flex flex-col gap-4 md:col-span-2">
+					{fields.map((field, index) => {
+						const fieldError = Array.isArray(evidencesError)
+							? evidencesError[index]
+							: undefined;
 
-			{fields.map((field, index) => {
-				const fieldError = Array.isArray(evidencesError)
-					? evidencesError[index]
-					: undefined;
+						return (
+							<ArrayItemCard
+								key={field.id}
+								title={`Evidence #${index + 1}`}
+								canRemove={fields.length > 1}
+								onRemoveAction={() => remove(index)}
+							>
+								<FormField label="Location" error={fieldError?.location as any}>
+									<Input
+										{...register(`evidences.${index}.location` as const)}
+									/>
+								</FormField>
+								<FormField
+									label="Description (player-facing)"
+									error={fieldError?.description as any}
+								>
+									<CaseTextarea
+										{...register(`evidences.${index}.description` as const)}
+									/>
+								</FormField>
+								<FormField
+									label="Significance (AI-only)"
+									error={fieldError?.significance as any}
+								>
+									<CaseTextarea
+										{...register(`evidences.${index}.significance` as const)}
+									/>
+								</FormField>
+							</ArrayItemCard>
+						);
+					})}
 
-				return (
-					<ArrayItemCard
-						key={field.id}
-						title={`Evidence #${index + 1}`}
-						canRemove={fields.length > 1}
-						onRemoveAction={() => remove(index)}
+					<Button
+						type="button"
+						variant="outline"
+						onClick={() =>
+							append({
+								location: '',
+								description: '',
+								significance: ''
+							})
+						}
 					>
-						<FormField label="Location" error={fieldError?.location as any}>
-							<Input {...register(`evidences.${index}.location` as const)} />
-						</FormField>
-						<FormField
-							label="Description (player-facing)"
-							error={fieldError?.description as any}
-						>
-							<CaseTextarea
-								{...register(`evidences.${index}.description` as const)}
-							/>
-						</FormField>
-						<FormField
-							label="Significance (AI-only)"
-							error={fieldError?.significance as any}
-						>
-							<CaseTextarea
-								{...register(`evidences.${index}.significance` as const)}
-							/>
-						</FormField>
-					</ArrayItemCard>
-				);
-			})}
-
-			<Button
-				type="button"
-				variant="outline"
-				onClick={() =>
-					append({
-						location: '',
-						description: '',
-						significance: ''
-					})
-				}
-			>
-				+ Add evidence
-			</Button>
+						+ Add evidence
+					</Button>
+				</div>
+			</div>
 		</SectionCard>
 	);
 };
