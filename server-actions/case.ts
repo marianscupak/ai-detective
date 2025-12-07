@@ -3,7 +3,10 @@
 import { headers } from 'next/headers';
 
 import { auth } from '@/lib/auth';
-import { CaseLeaderboardEntry, type DetectiveCaseListItem } from '@/types/case';
+import {
+	type CaseLeaderboardEntry,
+	type DetectiveCaseListItem
+} from '@/types/case';
 import {
 	dbGetAllCaseThemes,
 	dbGetAllDetectiveCasesWithStatus,

@@ -72,7 +72,7 @@ export const dbGetLeaderboardForCase = async (caseId: string) => {
 	);
 
 	results.sort((a, b) => a.messageCount - b.messageCount);
-	return results;
+	return results.slice(0, 3);
 };
 
 export const dbGetAllDetectiveCases = async (): Promise<

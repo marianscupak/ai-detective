@@ -27,7 +27,7 @@ const RootLayout = ({
 	return (
 		<html lang="en">
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} flex h-screen flex-col antialiased`}
 			>
 				<Navigation />
 				<div className="flex-1 overflow-auto bg-slate-50">{children}</div>

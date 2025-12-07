@@ -9,9 +9,7 @@ type Props = {
 };
 
 export const Leaderboard = ({ entries }: Props) => {
-	const topThree = entries.slice(0, 3);
-
-	if (topThree.length === 0) {
+	if (entries.length === 0) {
 		return (
 			<div className="rounded-xl border border-gray-200 bg-white p-6 text-gray-600 shadow">
 				No players have solved this case yet.
@@ -40,7 +38,7 @@ export const Leaderboard = ({ entries }: Props) => {
 			</h2>
 
 			<div className="space-y-4">
-				{topThree.map((entry, index) => (
+				{entries.map((entry, index) => (
 					<div
 						key={entry.userId}
 						className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3"

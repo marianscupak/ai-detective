@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import { StoryAsideNav } from '@/components/story-aside-nav';
 import {
 	StoryHeader,
@@ -42,12 +44,12 @@ const StoryPage = async ({ params }: StoryPageProps) => {
 				<StoryLeaderboardSection entries={leaderboard} />
 
 				<div className="mt-10 flex justify-end">
-					<a
+					<Link
 						href={`/cases/${storyId}/investigation`}
 						className="rounded-xl bg-blue-600 px-6 py-3 font-medium text-white shadow transition hover:bg-blue-700"
 					>
 						Solve Mystery
-					</a>
+					</Link>
 				</div>
 			</main>
 		</div>

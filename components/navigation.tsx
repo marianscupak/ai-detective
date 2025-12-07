@@ -2,15 +2,17 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Book, PenSquare } from 'lucide-react';
 
 import ProfileLink from './profile-link';
 
+const NAV_ITEMS = [
+	{ label: 'Story Library', href: '/', icon: Book },
+	{ label: 'Create Story', href: '/create-story', icon: PenSquare }
+];
+
 export const Navigation = () => {
 	const pathname = usePathname();
-	const navItems = [
-		{ label: 'Story Library', href: '/' },
-		{ label: 'Create Story', href: '/create-story' }
-	];
 
 	return (
 		<nav className="sticky top-0 z-50 w-full bg-white shadow-sm dark:bg-gray-900">
@@ -23,7 +25,7 @@ export const Navigation = () => {
 				</Link>
 
 				<div className="hidden gap-10 md:flex">
-					{navItems.map(item => {
+					{NAV_ITEMS.map(item => {
 						const isActive = pathname === item.href;
 
 						return (
@@ -37,6 +39,27 @@ export const Navigation = () => {
 								{isActive && (
 									<span className="absolute right-0 -bottom-1 left-0 mx-auto h-0.5 w-full rounded bg-blue-600" />
 								)}
+							</Link>
+						);
+					})}
+				</div>
+
+				<div className="flex items-center gap-4 md:hidden">
+					{NAV_ITEMS.map(item => {
+						const Icon = item.icon;
+						const isActive = pathname === item.href;
+
+						return (
+							<Link
+								key={item.href}
+								href={item.href}
+								className={`rounded-lg p-2 transition ${
+									isActive
+										? 'text-blue-600'
+										: 'text-gray-700 dark:text-gray-200'
+								} hover:text-blue-700`}
+							>
+								<Icon className="h-6 w-6" />
 							</Link>
 						);
 					})}

@@ -1,6 +1,7 @@
 'use client';
 
 import { CheckCircle, CircleDashed, Clock } from 'lucide-react';
+import { format } from 'date-fns';
 
 import {
 	type CaseLeaderboardEntry,
@@ -17,7 +18,7 @@ export const StoryHeader = ({
 	story: DetectiveCase;
 	isSolvedForUser: boolean;
 }) => {
-	const formattedDate = new Date(story.createdAt).toLocaleDateString();
+	const formattedDate = format(new Date(story.createdAt), 'MMM d, yyyy');
 
 	return (
 		<header id="summary-section" className="mb-10 scroll-mt-4 border-b pb-6">
@@ -105,29 +106,37 @@ export const StoryCaseDetailsSection = ({
 	story
 }: {
 	story: DetectiveCase;
-}) => (
-	<section
-		id="case-details-section"
-		className="mb-12 scroll-mt-24 rounded-xl bg-white p-6 shadow"
-	>
-		<h2 className="mb-4 text-2xl font-semibold text-gray-900">Case Details</h2>
+}) => {
+	const formattedDateTime = format(
+		new Date(story.setting.dateTime),
+		'dd.MM.yyyy HH:mm'
+	);
+	return (
+		<section
+			id="case-details-section"
+			className="mb-12 scroll-mt-24 rounded-xl bg-white p-6 shadow"
+		>
+			<h2 className="mb-4 text-2xl font-semibold text-gray-900">
+				Case Details
+			</h2>
 
-		<ul className="space-y-2 text-gray-700">
-			<li>
-				<strong>Incident:</strong> {story.setting.incident}
-			</li>
-			<li>
-				<strong>Location:</strong> {story.setting.location}
-			</li>
-			<li>
-				<strong>Date & Time:</strong> {story.setting.dateTime}
-			</li>
-			<li>
-				<strong>Theme:</strong> {story.theme}
-			</li>
-		</ul>
-	</section>
-);
+			<ul className="space-y-2 text-gray-700">
+				<li>
+					<strong>Incident:</strong> {story.setting.incident}
+				</li>
+				<li>
+					<strong>Location:</strong> {story.setting.location}
+				</li>
+				<li>
+					<strong>Date & Time:</strong> {formattedDateTime}
+				</li>
+				<li>
+					<strong>Theme:</strong> {story.theme}
+				</li>
+			</ul>
+		</section>
+	);
+};
 
 export const StoryLeaderboardSection = ({
 	entries

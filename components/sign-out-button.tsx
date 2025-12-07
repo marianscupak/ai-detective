@@ -8,9 +8,13 @@ import { cn } from '@/lib/cn';
 
 type SignOutButtonProps = {
 	className?: string;
+	iconOnly?: boolean;
 };
 
-export const SignOutButton = ({ className }: SignOutButtonProps) => {
+export const SignOutButton = ({
+	className,
+	iconOnly = false
+}: SignOutButtonProps) => {
 	const router = useRouter();
 
 	return (
@@ -27,12 +31,12 @@ export const SignOutButton = ({ className }: SignOutButtonProps) => {
 				});
 			}}
 			className={cn(
-				'flex items-center gap-2 font-medium text-gray-700 transition hover:text-blue-700 dark:text-gray-200',
+				'flex flex-nowrap items-center gap-2 font-medium text-gray-700 transition hover:text-blue-700 dark:text-gray-200',
 				className
 			)}
 		>
 			<LogOut className="h-5 w-5" />
-			<span>Sign out</span>
+			{!iconOnly && <span>Sign out</span>}
 		</button>
 	);
 };
