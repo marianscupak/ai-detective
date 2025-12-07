@@ -36,7 +36,7 @@ const CasePage = async ({ params }: CasePageProps) => {
 				]}
 			/>
 
-			<main className="mx-auto max-w-4xl flex-1 px-8 py-12 md:ml-64">
+			<main className="mx-auto ml-0 max-w-4xl flex-1 px-8 py-12 md:ml-48 lg:ml-64">
 				<CaseHeader Case={Case} isSolvedForUser={isSolvedForUser} />
 				<CaseDetailsSection Case={Case} />
 				<CaseEvidenceSection Case={Case} />

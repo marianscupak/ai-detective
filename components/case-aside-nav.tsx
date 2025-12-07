@@ -10,7 +10,7 @@ export const CaseAsideNav = ({ items }: NavProps) => {
 	};
 
 	return (
-		<aside className="fixed top-16 left-0 z-30 h-[calc(100vh-64px)] w-64 border-r border-gray-300 bg-white p-6 md:block">
+		<aside className="fixed top-16 left-0 z-30 hidden h-[calc(100vh-64px)] w-48 border-r border-gray-300 bg-white p-4 md:block md:w-48 md:p-6 lg:w-64">
 			<div className="space-y-4">
 				<ul className="space-y-1">
 					{items.map(item => (
