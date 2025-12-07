@@ -4,29 +4,18 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
 
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogFooter,
-	DialogTitle
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { CaseSavedDialog } from '@/components/create-case/CaseSavedDialog';
+import { CreateCaseForm } from '@/components/create-case/CreateCaseForm';
+import { SectionCard } from '@/components/create-case/SectionCard';
 import {
 	type DetectiveCase,
 	type Character,
 	type Evidence
 } from '@/types/case';
 import { createCaseSchema, type CreateCaseFormValues } from '@/lib/schema/case';
-import { SectionCard } from '@/components/create-case/SectionCard';
-import { OverviewSection } from '@/components/create-case/sections/OverviewSection';
-import { SettingSection } from '@/components/create-case/sections/SettingSection';
-import { CharactersSection } from '@/components/create-case/sections/CharactersSection';
-import { SuspectsSection } from '@/components/create-case/sections/SuspectsSection';
-import { EvidenceSection } from '@/components/create-case/sections/EvidenceSection';
-import { SolutionSection } from '@/components/create-case/sections/SolutionSection';
-import { NotesSection } from '@/components/create-case/sections/NotesSection';
+import { createCaseAction } from '@/server-actions/case';
 
 const CreateCasePage: React.FC = () => {
 	const router = useRouter();
@@ -54,11 +43,7 @@ const CreateCasePage: React.FC = () => {
 		mode: 'onBlur'
 	});
 
-	const {
-		handleSubmit,
-		formState: { isSubmitting },
-		reset
-	} = formMethods;
+	const { reset } = formMethods;
 
 	const [output, setOutput] = React.useState<string | null>(null);
 	const [savedCaseId, setSavedCaseId] = React.useState<string | null>(null);
@@ -91,8 +76,8 @@ const CreateCasePage: React.FC = () => {
 		const culpritCharacterId = mappedSuspects[culpritIndex].id;
 
 		const detectiveCase: DetectiveCase = {
-			id: `frontend-ignored`, // backend přepíše podle title
-			authorId: 'frontend-ignored', // backend přepíše podle better-auth
+			id: `frontend-ignored`,
+			authorId: 'frontend-ignored',
 			createdAt: now,
 			title: values.title,
 			theme: values.theme,
@@ -125,26 +110,21 @@ const CreateCasePage: React.FC = () => {
 
 		setOutput(JSON.stringify(detectiveCase, null, 2));
 
-		try {
-			const res = await fetch('/api/cases', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(detectiveCase)
-			});
+		const result = await createCaseAction(detectiveCase);
 
-			if (!res.ok) {
-				throw new Error('Failed to save case');
-			}
-
-			const data = (await res.json()) as { id: string };
-			setSavedCaseId(data.id);
-			setIsDialogOpen(true);
-		} catch (err: any) {
-			console.error(err);
-			setError(err?.message ?? 'Unexpected error while saving case');
+		if (!result.success) {
+			setError(result.error);
+			return;
 		}
+
+		setSavedCaseId(result.caseId);
+		setIsDialogOpen(true);
+	};
+
+	const handleDialogConfirm = () => {
+		setIsDialogOpen(false);
+		reset();
+		router.push('/');
 	};
 
 	return (
@@ -155,45 +135,20 @@ const CreateCasePage: React.FC = () => {
 						<h1 className="text-2xl font-semibold tracking-tight">
 							Create Case
 						</h1>
-						<Button
-							variant="outline"
-							type="button"
-							onClick={() => router.push('/')}
+						<Link
+							href="/"
+							className="border-input bg-background ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring inline-flex h-10 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
 						>
 							Back to home
-						</Button>
+						</Link>
 					</div>
 
-					<form
-						onSubmit={handleSubmit(onSubmit)}
-						className="flex flex-col gap-6"
-					>
-						<OverviewSection form={formMethods} />
-						<SettingSection form={formMethods} />
-						<CharactersSection form={formMethods} />
-						<SuspectsSection form={formMethods} />
-						<EvidenceSection form={formMethods} />
-						<SolutionSection form={formMethods} />
-						<NotesSection form={formMethods} />
-
-						<div className="flex items-center justify-between">
-							<span className="text-muted-foreground text-xs" />
-							<Button type="submit" disabled={isSubmitting}>
-								{isSubmitting ? 'Saving...' : 'Save case'}
-							</Button>
-						</div>
-
-						{error && (
-							<p className="text-sm text-red-500">
-								Error while saving case: {error}
-							</p>
-						)}
-						{savedCaseId && (
-							<p className="text-sm text-emerald-600">
-								Case saved successfully with ID: {savedCaseId}
-							</p>
-						)}
-					</form>
+					<CreateCaseForm
+						form={formMethods}
+						onSubmitAction={onSubmit}
+						error={error}
+						savedCaseId={savedCaseId}
+					/>
 
 					{output && (
 						<SectionCard title="Generated DetectiveCase JSON">
@@ -205,27 +160,11 @@ const CreateCasePage: React.FC = () => {
 				</div>
 			</div>
 
-			<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle>Case saved successfully</DialogTitle>
-					</DialogHeader>
-					<p className="text-muted-foreground text-sm">
-						Your detective case has been created and stored in the database.
-					</p>
-					<DialogFooter>
-						<Button
-							onClick={() => {
-								setIsDialogOpen(false);
-								reset();
-								router.push('/');
-							}}
-						>
-							Go to homepage
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
+			<CaseSavedDialog
+				open={isDialogOpen}
+				onOpenChange={setIsDialogOpen}
+				onConfirm={handleDialogConfirm}
+			/>
 		</FormProvider>
 	);
 };
