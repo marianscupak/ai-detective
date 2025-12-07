@@ -1,6 +1,10 @@
-import { and, asc, count, eq, or } from 'drizzle-orm';
+import { and, asc, count, eq, or, sql } from 'drizzle-orm';
 
-import { type DetectiveCase } from '@/types/case';
+import {
+	type DetectiveCaseBaseView,
+	type DetectiveCase,
+	type DetectiveCaseListItem
+} from '@/types/case';
 import {
 	type ChatMessage,
 	type GameSession,
@@ -14,8 +18,96 @@ import {
 	gameSession,
 	chatMessage
 } from '@/db/schema/game-schema';
+import { user } from '@/db/schema/auth-schema';
 
 // ---------- CASES ----------
+
+export const dbGetLeaderboardForCase = async (caseId: string) => {
+	const sessions = await db
+		.select({
+			sessionId: gameSession.id,
+			userId: gameSession.userId,
+			userName: user.name,
+			startedAt: gameSession.startedAt
+		})
+		.from(gameSession)
+		.innerJoin(user, eq(user.id, gameSession.userId))
+		.where(
+			and(eq(gameSession.caseId, caseId), eq(gameSession.status, 'completed'))
+		);
+
+	const firstSessions = Object.values(
+		sessions.reduce(
+			(acc, s) => {
+				if (!acc[s.userId] || s.startedAt < acc[s.userId].startedAt) {
+					acc[s.userId] = s;
+				}
+				return acc;
+			},
+			{} as Record<string, (typeof sessions)[number]>
+		)
+	);
+
+	const results = await Promise.all(
+		firstSessions.map(async session => {
+			const [{ count }] = await db
+				.select({
+					count: sql<number>`COUNT(${chatMessage.id})`
+				})
+				.from(chatMessage)
+				.where(
+					and(
+						eq(chatMessage.gameSessionId, session.sessionId),
+						eq(chatMessage.role, 'player')
+					)
+				);
+
+			return {
+				userId: session.userId,
+				userName: session.userName,
+				caseId,
+				messageCount: count
+			};
+		})
+	);
+
+	results.sort((a, b) => a.messageCount - b.messageCount);
+	return results.slice(0, 3);
+};
+
+export const dbGetAllDetectiveCases = async (): Promise<
+	DetectiveCaseBaseView[]
+> => {
+	return await db.select().from(detectiveCase);
+};
+
+export const dbGetAllDetectiveCasesWithStatus = async (
+	userId: string
+): Promise<DetectiveCaseListItem[]> => {
+	const cases = await dbGetAllDetectiveCases();
+
+	const solvedSessions = await db
+		.select({ caseId: gameSession.caseId })
+		.from(gameSession)
+		.where(
+			and(eq(gameSession.userId, userId), eq(gameSession.status, 'completed'))
+		);
+
+	const solvedCaseIds = new Set(solvedSessions.map(s => s.caseId));
+
+	return cases.map(c => ({
+		...c,
+		isSolvedForUser: solvedCaseIds.has(c.id)
+	}));
+};
+
+export const dbGetAllCaseThemes = async (): Promise<string[]> => {
+	const rows = await db
+		.select({ theme: detectiveCase.theme })
+		.from(detectiveCase);
+
+	return Array.from(new Set(rows.map(r => r.theme)));
+};
 
 export const getOngoingUserInvestigations = async (userId: string) => {
 	return await db
@@ -137,6 +229,25 @@ export const getCaseById = async (
 };
 
 // ---------- GAME SESSIONS ----------
+
+export const dbUserHasCompletedCase = async (
+	userId: string,
+	caseId: string
+): Promise<boolean> => {
+	const result = await db
+		.select({ id: gameSession.id })
+		.from(gameSession)
+		.where(
+			and(
+				eq(gameSession.userId, userId),
+				eq(gameSession.caseId, caseId),
+				eq(gameSession.status, 'completed')
+			)
+		)
+		.limit(1);
+
+	return result.length > 0;
+};
 
 export const findOrCreateGameSession = async (
 	userId: string,

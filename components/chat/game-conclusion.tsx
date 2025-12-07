@@ -19,7 +19,7 @@ export const GameConclusion = () => (
 			</span>
 		</div>
 		<Button asChild className="mt-4">
-			<Link href="/">Back to Case Library</Link>
+			<Link href="/cases">Back to Case Library</Link>
 		</Button>
 	</div>
 );
