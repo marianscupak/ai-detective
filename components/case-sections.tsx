@@ -11,14 +11,14 @@ import {
 
 import { Leaderboard } from './leaderboard';
 
-export const StoryHeader = ({
-	story,
+export const CaseHeader = ({
+	Case,
 	isSolvedForUser
 }: {
-	story: DetectiveCase;
+	Case: DetectiveCase;
 	isSolvedForUser: boolean;
 }) => {
-	const formattedDate = format(new Date(story.createdAt), 'MMM d, yyyy');
+	const formattedDate = format(new Date(Case.createdAt), 'MMM d, yyyy');
 
 	return (
 		<header id="summary-section" className="mb-10 scroll-mt-4 border-b pb-6">
@@ -41,14 +41,14 @@ export const StoryHeader = ({
 				)}
 			</div>
 
-			<h1 className="mt-4 text-4xl font-bold text-gray-900">{story.title}</h1>
+			<h1 className="mt-4 text-4xl font-bold text-gray-900">{Case.title}</h1>
 
-			<p className="mt-4 max-w-2xl text-gray-700">{story.summary}</p>
+			<p className="mt-4 max-w-2xl text-gray-700">{Case.summary}</p>
 		</header>
 	);
 };
 
-export const StoryEvidenceSection = ({ story }: { story: DetectiveCase }) => (
+export const CaseEvidenceSection = ({ Case }: { Case: DetectiveCase }) => (
 	<section
 		id="evidence-section"
 		className="mb-12 scroll-mt-24 rounded-xl bg-white p-6 shadow"
@@ -56,7 +56,7 @@ export const StoryEvidenceSection = ({ story }: { story: DetectiveCase }) => (
 		<h2 className="mb-4 text-2xl font-semibold text-gray-900">Evidence</h2>
 
 		<ul className="space-y-3 text-gray-700">
-			{story.evidence.map(e => (
+			{Case.evidence.map(e => (
 				<li key={e.id} className="border-t pt-3">
 					<strong>{e.location}:</strong> {e.description}
 				</li>
@@ -65,7 +65,7 @@ export const StoryEvidenceSection = ({ story }: { story: DetectiveCase }) => (
 	</section>
 );
 
-export const StoryCharactersSection = ({ story }: { story: DetectiveCase }) => (
+export const CaseCharactersSection = ({ Case }: { Case: DetectiveCase }) => (
 	<section
 		id="characters-section"
 		className="mb-12 scroll-mt-24 rounded-xl bg-white p-6 shadow"
@@ -74,24 +74,24 @@ export const StoryCharactersSection = ({ story }: { story: DetectiveCase }) => (
 
 		<ul className="space-y-6">
 			<li>
-				<h3 className="text-lg font-medium">{story.characters.player.name}</h3>
+				<h3 className="text-lg font-medium">{Case.characters.player.name}</h3>
 				<p className="text-sm text-gray-500">Player</p>
 				<p className="mt-1 text-gray-700">
-					{story.characters.player.description}
+					{Case.characters.player.description}
 				</p>
 			</li>
 
 			<li>
 				<h3 className="text-lg font-medium">
-					{story.characters.victimOrTarget.name}
+					{Case.characters.victimOrTarget.name}
 				</h3>
 				<p className="text-sm text-gray-500">Victim</p>
 				<p className="mt-1 text-gray-700">
-					{story.characters.victimOrTarget.description}
+					{Case.characters.victimOrTarget.description}
 				</p>
 			</li>
 
-			{story.characters.suspects.map((character: Character) => (
+			{Case.characters.suspects.map((character: Character) => (
 				<li key={character.id}>
 					<h3 className="text-lg font-medium">{character.name}</h3>
 					<p className="text-sm text-gray-500">Suspect</p>
@@ -102,13 +102,9 @@ export const StoryCharactersSection = ({ story }: { story: DetectiveCase }) => (
 	</section>
 );
 
-export const StoryCaseDetailsSection = ({
-	story
-}: {
-	story: DetectiveCase;
-}) => {
+export const CaseDetailsSection = ({ Case }: { Case: DetectiveCase }) => {
 	const formattedDateTime = format(
-		new Date(story.setting.dateTime),
+		new Date(Case.setting.dateTime),
 		'dd.MM.yyyy HH:mm'
 	);
 	return (
@@ -122,23 +118,23 @@ export const StoryCaseDetailsSection = ({
 
 			<ul className="space-y-2 text-gray-700">
 				<li>
-					<strong>Incident:</strong> {story.setting.incident}
+					<strong>Incident:</strong> {Case.setting.incident}
 				</li>
 				<li>
-					<strong>Location:</strong> {story.setting.location}
+					<strong>Location:</strong> {Case.setting.location}
 				</li>
 				<li>
 					<strong>Date & Time:</strong> {formattedDateTime}
 				</li>
 				<li>
-					<strong>Theme:</strong> {story.theme}
+					<strong>Theme:</strong> {Case.theme}
 				</li>
 			</ul>
 		</section>
 	);
 };
 
-export const StoryLeaderboardSection = ({
+export const CaseLeaderboardSection = ({
 	entries
 }: {
 	entries: CaseLeaderboardEntry[];
@@ -155,9 +151,9 @@ export const StoryLeaderboardSection = ({
 	</section>
 );
 export default {
-	StoryHeader,
-	StoryEvidenceSection,
-	StoryCharactersSection,
-	StoryCaseDetailsSection,
-	StoryLeaderboardSection
+	CaseHeader,
+	CaseEvidenceSection,
+	CaseCharactersSection,
+	CaseDetailsSection,
+	CaseLeaderboardSection
 };

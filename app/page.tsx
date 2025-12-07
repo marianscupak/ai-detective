@@ -12,6 +12,6 @@ export const Home = async () => {
 		redirect('/sign-in');
 	}
 
-	redirect('/stories');
+	redirect('/cases');
 };
 export default Home;

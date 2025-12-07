@@ -5,7 +5,7 @@ import { useState, useMemo } from 'react';
 import { type DetectiveCaseListItem } from '@/types/case';
 import { type FilterOptions } from '@/components/filter-bar';
 
-export const useStoriesFilter = (stories: DetectiveCaseListItem[]) => {
+export const useCasesFilter = (cases: DetectiveCaseListItem[]) => {
 	const [filters, setFilters] = useState<FilterOptions>({
 		solved: 'all',
 		date: 'newest',
@@ -13,11 +13,11 @@ export const useStoriesFilter = (stories: DetectiveCaseListItem[]) => {
 		theme: ''
 	});
 
-	const filteredStories = useMemo(() => {
+	const filteredCases = useMemo(() => {
 		const searchText = filters.search.toLowerCase();
 		const selectedTheme = filters.theme.toLowerCase();
 
-		let result = [...stories];
+		let result = [...cases];
 
 		if (searchText) {
 			result = result.filter(story => {
@@ -52,7 +52,7 @@ export const useStoriesFilter = (stories: DetectiveCaseListItem[]) => {
 		});
 
 		return result;
-	}, [stories, filters]);
+	}, [cases, filters]);
 
-	return { filteredStories, setFilters };
+	return { filteredCases, setFilters };
 };

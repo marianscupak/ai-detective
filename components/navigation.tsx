@@ -7,8 +7,8 @@ import { Book, PenSquare } from 'lucide-react';
 import ProfileLink from './profile-link';
 
 const NAV_ITEMS = [
-	{ label: 'Story Library', href: '/', icon: Book },
-	{ label: 'Create Story', href: '/create-story', icon: PenSquare }
+	{ label: 'Case Library', href: '/cases', icon: Book },
+	{ label: 'Create Case', href: '/create-story', icon: PenSquare }
 ];
 
 export const Navigation = () => {
@@ -18,8 +18,8 @@ export const Navigation = () => {
 		<nav className="sticky top-0 z-50 w-full bg-white shadow-sm dark:bg-gray-900">
 			<div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
 				<Link
-					href="/"
-					className="text-2xl font-semibold tracking-wide hover:text-blue-700"
+					href="/cases"
+					className="text-2xl font-semibold tracking-wide text-gray-900 hover:text-blue-700 dark:text-white"
 				>
 					AI DETECTIVE
 				</Link>

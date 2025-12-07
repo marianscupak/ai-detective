@@ -3,11 +3,11 @@ import Link from 'next/link';
 
 import { type DetectiveCaseListItem } from '@/types/case';
 
-type StoryProps = {
+type Props = {
 	story: DetectiveCaseListItem;
 };
 
-export const StoryCard = ({ story }: StoryProps) => {
+export const CaseCard = ({ story }: Props) => {
 	const { id, title, summary, createdAt, isSolvedForUser } = story;
 
 	const formattedDate = new Date(createdAt).toLocaleDateString();
@@ -38,13 +38,13 @@ export const StoryCard = ({ story }: StoryProps) => {
 			<p className="mb-6 text-sm leading-relaxed text-gray-600">{summary}</p>
 
 			<Link
-				href={`/stories/${id}`}
+				href={`/cases/${id}`}
 				className="inline-block rounded-lg bg-blue-500 px-4 py-2 text-center font-medium text-white transition hover:bg-blue-700"
 			>
-				Story details
+				Case details
 			</Link>
 		</div>
 	);
 };
 
-export default StoryCard;
+export default CaseCard;

@@ -36,7 +36,7 @@ export const FilterBar = ({
 				<Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
 				<input
 					type="text"
-					placeholder="Search stories..."
+					placeholder="Find case..."
 					className="w-full rounded-xl border border-gray-200 py-3 pr-4 pl-11 text-gray-700"
 					value={filters.search}
 					onChange={e => update('search', e.target.value)}
@@ -65,7 +65,7 @@ export const FilterBar = ({
 					value={filters.solved}
 					onChange={e => update('solved', e.target.value)}
 				>
-					<option value="all">All stories</option>
+					<option value="all">All cases</option>
 					<option value="solved">Solved</option>
 					<option value="unsolved">Unsolved</option>
 				</select>

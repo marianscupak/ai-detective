@@ -4,7 +4,7 @@ type NavProps = {
 	items: { id: string; label: string }[];
 };
 
-export const StoryAsideNav = ({ items }: NavProps) => {
+export const CaseAsideNav = ({ items }: NavProps) => {
 	const scrollTo = (id: string) => {
 		document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 	};
