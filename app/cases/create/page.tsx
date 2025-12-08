@@ -8,7 +8,6 @@ import Link from 'next/link';
 
 import { CaseSavedDialog } from '@/components/create-case/case-saved-dialog';
 import { CreateCaseForm } from '@/components/create-case/create-case-form';
-import { SectionCard } from '@/components/create-case/section-card';
 import {
 	type DetectiveCase,
 	type Character,
@@ -45,7 +44,6 @@ const CreateCasePage: React.FC = () => {
 
 	const { reset } = formMethods;
 
-	const [output, setOutput] = React.useState<string | null>(null);
 	const [savedCaseId, setSavedCaseId] = React.useState<string | null>(null);
 	const [error, setError] = React.useState<string | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -108,8 +106,6 @@ const CreateCasePage: React.FC = () => {
 			notesForAI: values.notesForAI ?? undefined
 		};
 
-		setOutput(JSON.stringify(detectiveCase, null, 2));
-
 		const result = await createCaseAction(detectiveCase);
 
 		if (!result.success) {
@@ -149,14 +145,6 @@ const CreateCasePage: React.FC = () => {
 						error={error}
 						savedCaseId={savedCaseId}
 					/>
-
-					{output && (
-						<SectionCard title="Generated DetectiveCase JSON">
-							<pre className="bg-muted text-foreground max-h-[400px] overflow-auto rounded-md p-4 text-xs">
-								{output}
-							</pre>
-						</SectionCard>
-					)}
 				</div>
 			</div>
 

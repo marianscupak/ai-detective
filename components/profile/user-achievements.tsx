@@ -20,8 +20,22 @@ const UserAchievementList = async () => {
 								: 'border-border bg-muted'
 						)}
 					>
-						<div className="text-sm font-semibold text-black">{ach.title}</div>
-						<p className="text-xs text-black">{ach.description}</p>
+						<div
+							className={cn(
+								'text-sm font-semibold',
+								ach.isUnlocked ? 'text-black' : 'text-gray-400'
+							)}
+						>
+							{ach.title}
+						</div>
+						<p
+							className={cn(
+								'text-xs',
+								ach.isUnlocked ? 'text-black' : 'text-gray-400'
+							)}
+						>
+							{ach.description}
+						</p>
 
 						{ach.isUnlocked ? (
 							<div className="text-xs text-blue-700">
