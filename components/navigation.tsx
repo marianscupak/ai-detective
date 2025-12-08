@@ -8,7 +8,7 @@ import ProfileLink from './profile-link';
 
 const NAV_ITEMS = [
 	{ label: 'Case Library', href: '/cases', icon: Book },
-	{ label: 'Create Case', href: '/create-story', icon: PenSquare }
+	{ label: 'Create Case', href: '/create-case', icon: PenSquare }
 ];
 
 export const Navigation = () => {

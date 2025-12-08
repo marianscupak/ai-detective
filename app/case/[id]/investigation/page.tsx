@@ -1,7 +1,22 @@
 import { notFound } from 'next/navigation';
+import { type Metadata } from 'next';
 
 import { loadGameSession } from '@/server-actions/game';
 import { GameClientShell } from '@/components/chat/game-client-shell';
+import { getDetectiveCaseById } from '@/server-actions/case';
+
+export const generateMetadata = async ({
+	params
+}: Props): Promise<Metadata> => {
+	const { id } = await params;
+
+	const detectiveCase = await getDetectiveCaseById(id);
+
+	return {
+		title: detectiveCase.title,
+		description: detectiveCase.summary
+	};
+};
 
 type Props = {
 	params: Promise<{

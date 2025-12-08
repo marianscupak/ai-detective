@@ -1,4 +1,10 @@
+import { type Metadata } from 'next';
+
 import { SigninButton } from './sign-in-button';
+
+export const metadata: Metadata = {
+	title: 'Sign In'
+};
 
 const SigninPage = () => {
 	return (
