@@ -1,4 +1,4 @@
-import { SigninButton } from './sign-in-button';
+import { SigninButton } from '../../components/layout/sign-in-button';
 
 const SigninPage = () => {
 	return (
