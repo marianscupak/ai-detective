@@ -6,9 +6,9 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 
-import { CaseSavedDialog } from '@/components/create-case/CaseSavedDialog';
-import { CreateCaseForm } from '@/components/create-case/CreateCaseForm';
-import { SectionCard } from '@/components/create-case/SectionCard';
+import { CaseSavedDialog } from '@/components/create-case/case-saved-dialog';
+import { CreateCaseForm } from '@/components/create-case/create-case-form';
+import { SectionCard } from '@/components/create-case/section-card';
 import {
 	type DetectiveCase,
 	type Character,
