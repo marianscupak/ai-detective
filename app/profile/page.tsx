@@ -1,7 +1,13 @@
+import { type Metadata } from 'next';
+
 import OngoingInvestigations from '../../components/profile/ongoing-investigations';
 import CompletedInvestigations from '../../components/profile/completed-investigations';
 import ProfileInfo from '../../components/profile/profile-info';
 import UserAchievements from '../../components/profile/user-achievements';
+
+export const metadata: Metadata = {
+	title: 'Your profile'
+};
 
 const ProfilePage = () => {
 	return (

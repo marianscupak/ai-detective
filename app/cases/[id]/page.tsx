@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { type Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { CaseAsideNav } from '@/components/case/case-aside-nav';
@@ -15,8 +16,21 @@ import {
 	CaseLeaderboardSection
 } from '@/components/case/case-sections';
 
+export const generateMetadata = async ({
+	params
+}: CasePageProps): Promise<Metadata> => {
+	const { id } = await params;
+
+	const detectiveCase = await getDetectiveCaseById(id);
+
+	return {
+		title: detectiveCase.title,
+		description: detectiveCase.summary
+	};
+};
+
 type CasePageProps = {
-	params: { id: string };
+	params: Promise<{ id: string }>;
 };
 
 const CasePage = async ({ params }: CasePageProps) => {

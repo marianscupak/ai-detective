@@ -16,6 +16,7 @@ import {
 	dbUserHasCompletedCase,
 	getCaseById
 } from '@/lib/database/game';
+import { handleCreateStoryAchiements } from '@/lib/achievements';
 
 import requireAuth from './require-auth';
 
@@ -31,6 +32,7 @@ export const createCaseAction = async (
 
 		const caseId = await dbCreateCase(data, userId);
 
+		await handleCreateStoryAchiements(userId);
 		revalidatePath('/');
 
 		return { success: true, caseId };
