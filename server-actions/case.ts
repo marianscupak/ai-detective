@@ -1,5 +1,7 @@
 'use server';
 
+import { notFound } from 'next/navigation';
+
 import {
 	type CaseLeaderboardEntry,
 	type DetectiveCaseListItem
@@ -18,7 +20,7 @@ export const getDetectiveCaseById = async (caseId: string) => {
 	await requireAuth();
 
 	const result = await getCaseById(caseId);
-	if (!result) throw new Error('Case not found');
+	if (!result) notFound();
 
 	return result;
 };

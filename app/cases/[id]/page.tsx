@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 import { CaseAsideNav } from '@/components/case-aside-nav';
 import {
@@ -21,6 +22,11 @@ type CasePageProps = {
 const CasePage = async ({ params }: CasePageProps) => {
 	const { id } = await params;
 	const Case = await getDetectiveCaseById(id);
+
+	if (!Case) {
+		notFound();
+	}
+
 	const isSolvedForUser = await userHasCompletedCase(id);
 	const leaderboard = await getLeaderboardForCase(id);
 
