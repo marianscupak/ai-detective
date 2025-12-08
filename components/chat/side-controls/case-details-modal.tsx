@@ -17,7 +17,7 @@ import {
 	CaseCharactersSection,
 	CaseDetailsSection,
 	CaseEvidenceSection
-} from '@/components/case-sections';
+} from '@/components/case/case-sections';
 
 type Props = {
 	detectiveCase: DetectiveCase;
