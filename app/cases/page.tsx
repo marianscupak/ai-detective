@@ -3,7 +3,7 @@ import { headers } from 'next/headers';
 import { type Metadata } from 'next';
 
 import { auth } from '@/lib/auth';
-import CaseLibrary from '@/components/case-library';
+import CaseLibrary from '@/components/case/case-library';
 import {
 	getAllCaseThemes,
 	getAllDetectiveCasesWithStatus

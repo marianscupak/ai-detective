@@ -36,21 +36,21 @@ type ChatRoomProps = {
 	initialGameSession: GameSession;
 	messages: ChatMessage[];
 	setMessages: Dispatch<SetStateAction<ChatMessage[]>>;
+	isGameFinished: boolean;
+	setIsGameFinished: Dispatch<SetStateAction<boolean>>;
 };
 
 export const Chat = ({
 	initialCaseDetails,
 	initialGameSession,
 	messages,
-	setMessages
+	setMessages,
+	isGameFinished,
+	setIsGameFinished
 }: ChatRoomProps) => {
 	const [input, setInput] = useState('');
 	const [isPending, startTransition] = useTransition();
 	const inputRef = useRef<HTMLTextAreaElement | null>(null);
-
-	const [isGameFinished, setIsGameFinished] = useState(
-		initialGameSession.status === 'completed'
-	);
 
 	const [currentProgress, setCurrentProgress] = useState(
 		initialGameSession.progress ?? 0

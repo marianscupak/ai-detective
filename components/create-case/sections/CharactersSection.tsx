@@ -3,9 +3,9 @@
 import React from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 
-import { SectionCard } from '@/components/create-case/SectionCard';
-import { FormField } from '@/components/create-case/FormField';
-import { CaseTextarea } from '@/components/create-case/CaseTextarea';
+import { SectionCard } from '@/components/create-case/section-card';
+import { FormField } from '@/components/create-case/form-field';
+import { CaseTextarea } from '@/components/create-case/case-textarea';
 import { Input } from '@/components/ui/input';
 import type { CreateCaseFormValues } from '@/lib/schema/case';
 

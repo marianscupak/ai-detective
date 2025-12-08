@@ -6,15 +6,21 @@ import { Card, CardContent } from '@/components/ui/card';
 import { type ChatMessage } from '@/types/game';
 import { AbandonCaseDialog } from '@/components/chat/side-controls/abandon-case-dialog';
 import { RequestHintDialog } from '@/components/chat/side-controls/request-hint-dialog';
+import { CaseDetailsModal } from '@/components/chat/side-controls/case-details-modal';
+import { type DetectiveCase } from '@/types/case';
 
 type SideControlsProps = {
 	gameSessionId: string;
 	setMessages: Dispatch<SetStateAction<ChatMessage[]>>;
+	detectiveCase: DetectiveCase;
+	isGameFinished: boolean;
 };
 
 export const SideControls = ({
 	gameSessionId,
-	setMessages
+	setMessages,
+	detectiveCase,
+	isGameFinished
 }: SideControlsProps) => {
 	return (
 		<Card className="w-full lg:w-48">
@@ -23,9 +29,11 @@ export const SideControls = ({
 					Case Actions
 				</h3>
 
+				<CaseDetailsModal detectiveCase={detectiveCase} />
 				<RequestHintDialog
 					gameSessionId={gameSessionId}
 					setMessages={setMessages}
+					disabled={isGameFinished}
 				/>
 				<AbandonCaseDialog gameSessionId={gameSessionId} />
 			</CardContent>

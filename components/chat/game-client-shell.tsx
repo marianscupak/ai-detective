@@ -19,6 +19,9 @@ export const GameClientShell = ({
 	initialCaseDetails
 }: Props) => {
 	const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
+	const [isGameFinished, setIsGameFinished] = useState(
+		initialGameSession.status === 'completed'
+	);
 
 	return (
 		<div className="container mx-auto flex h-full flex-col items-start gap-8 px-4 py-8 lg:flex-row">
@@ -27,12 +30,16 @@ export const GameClientShell = ({
 				initialGameSession={initialGameSession}
 				messages={messages}
 				setMessages={setMessages}
+				isGameFinished={isGameFinished}
+				setIsGameFinished={setIsGameFinished}
 			/>
 
 			<div className="w-full lg:w-auto">
 				<SideControls
+					detectiveCase={initialCaseDetails}
 					gameSessionId={initialGameSession.id}
 					setMessages={setMessages}
+					isGameFinished={isGameFinished}
 				/>
 			</div>
 		</div>

@@ -1,6 +1,6 @@
 import { type Metadata } from 'next';
 
-import { SigninButton } from './sign-in-button';
+import { SigninButton } from '../../components/layout/sign-in-button';
 
 export const metadata: Metadata = {
 	title: 'Sign In'

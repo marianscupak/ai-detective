@@ -8,10 +8,10 @@ import {
 } from 'react-hook-form';
 
 import type { CreateCaseFormValues } from '@/lib/schema/case';
-import { SectionCard } from '@/components/create-case/SectionCard';
-import { FormField } from '@/components/create-case/FormField';
-import { CaseTextarea } from '@/components/create-case/CaseTextarea';
-import { ArrayItemCard } from '@/components/create-case/ArrayItemCard';
+import { SectionCard } from '@/components/create-case/section-card';
+import { FormField } from '@/components/create-case/form-field';
+import { CaseTextarea } from '@/components/create-case/case-textarea';
+import { ArrayItemCard } from '@/components/create-case/array-item-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 

@@ -1,7 +1,7 @@
 'use client';
 
-import { CaseCard } from '@/components/case-card';
-import { FilterBar } from '@/components/filter-bar';
+import { CaseCard } from '@/components/case/case-card';
+import { FilterBar } from '@/components/case/filter-bar';
 import { useCasesFilter } from '@/hooks/useCasesFilter';
 import { type DetectiveCaseListItem } from '@/types/case';
 

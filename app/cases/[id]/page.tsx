@@ -1,19 +1,33 @@
 import Link from 'next/link';
 import { type Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
-import { CaseAsideNav } from '@/components/case-aside-nav';
-import {
-	CaseHeader,
-	CaseEvidenceSection,
-	CaseCharactersSection,
-	CaseDetailsSection,
-	CaseLeaderboardSection
-} from '@/components/case-sections';
+import { CaseAsideNav } from '@/components/case/case-aside-nav';
 import {
 	getDetectiveCaseById,
 	getLeaderboardForCase,
 	userHasCompletedCase
 } from '@/server-actions/case';
+import {
+	CaseCharactersSection,
+	CaseDetailsSection,
+	CaseEvidenceSection,
+	CaseHeader,
+	CaseLeaderboardSection
+} from '@/components/case/case-sections';
+
+export const generateMetadata = async ({
+	params
+}: CasePageProps): Promise<Metadata> => {
+	const { id } = await params;
+
+	const detectiveCase = await getDetectiveCaseById(id);
+
+	return {
+		title: detectiveCase.title,
+		description: detectiveCase.summary
+	};
+};
 
 export const generateMetadata = async ({
 	params
@@ -35,6 +49,11 @@ type CasePageProps = {
 const CasePage = async ({ params }: CasePageProps) => {
 	const { id } = await params;
 	const Case = await getDetectiveCaseById(id);
+
+	if (!Case) {
+		notFound();
+	}
+
 	const isSolvedForUser = await userHasCompletedCase(id);
 	const leaderboard = await getLeaderboardForCase(id);
 
@@ -59,8 +78,8 @@ const CasePage = async ({ params }: CasePageProps) => {
 
 				<div className="mt-10 flex justify-end">
 					<Link
-						href={`/case/${id}/investigation`}
-						className="rounded-xl bg-blue-700 px-6 py-3 font-medium text-white shadow transition hover:bg-blue-900"
+						href={`/cases/${id}/investigation`}
+						className="rounded-xl bg-blue-600 px-6 py-3 font-medium text-white shadow transition hover:bg-blue-700"
 					>
 						{isSolvedForUser ? 'View Solution' : 'Solve Mystery'}
 					</Link>

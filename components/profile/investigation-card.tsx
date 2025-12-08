@@ -51,13 +51,13 @@ const InvestigationCard = ({
 		</div>
 		<div className="flex items-end justify-around lg:flex-col">
 			<Link
-				href={`/case/${investigation.caseId}`}
+				href={`/cases/${investigation.caseId}`}
 				className="text-sm font-medium md:text-xs xl:text-sm"
 			>
 				Case details
 			</Link>
 			<Link
-				href={`/case/${investigation.caseId}/investigation`}
+				href={`/cases/${investigation.caseId}/investigation`}
 				className="text-sm font-medium md:text-xs xl:text-sm"
 			>
 				{variant === 'completed' ? 'View investigation' : 'Continue'}

@@ -48,9 +48,14 @@ type HintFormValues = {
 type Props = {
 	gameSessionId: string;
 	setMessages: Dispatch<SetStateAction<ChatMessage[]>>;
+	disabled?: boolean;
 };
 
-export const RequestHintDialog = ({ gameSessionId, setMessages }: Props) => {
+export const RequestHintDialog = ({
+	gameSessionId,
+	setMessages,
+	disabled
+}: Props) => {
 	const [isHintPending, startHintTransition] = useTransition();
 	const [isHintDialogOpen, setIsHintDialogOpen] = useState(false);
 
@@ -102,7 +107,7 @@ export const RequestHintDialog = ({ gameSessionId, setMessages }: Props) => {
 				<Button
 					variant="outline"
 					className="w-full justify-start"
-					disabled={isHintPending}
+					disabled={isHintPending || disabled}
 				>
 					<HelpCircle className="mr-2 h-4 w-4" />
 					Get a Hint
