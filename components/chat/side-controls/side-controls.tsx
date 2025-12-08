@@ -13,12 +13,14 @@ type SideControlsProps = {
 	gameSessionId: string;
 	setMessages: Dispatch<SetStateAction<ChatMessage[]>>;
 	detectiveCase: DetectiveCase;
+	isGameFinished: boolean;
 };
 
 export const SideControls = ({
 	gameSessionId,
 	setMessages,
-	detectiveCase
+	detectiveCase,
+	isGameFinished
 }: SideControlsProps) => {
 	return (
 		<Card className="w-full lg:w-48">
@@ -31,6 +33,7 @@ export const SideControls = ({
 				<RequestHintDialog
 					gameSessionId={gameSessionId}
 					setMessages={setMessages}
+					disabled={isGameFinished}
 				/>
 				<AbandonCaseDialog gameSessionId={gameSessionId} />
 			</CardContent>
