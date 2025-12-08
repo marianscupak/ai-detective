@@ -24,7 +24,7 @@ export const unlockAchievement = async (
 
 	const id = crypto.randomUUID();
 
-	db.insert(userAchievements).values([
+	await db.insert(userAchievements).values([
 		{
 			id,
 			achievementId,

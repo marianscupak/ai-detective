@@ -22,6 +22,7 @@ import {
 	dbUserHasCompletedCase,
 	getCaseById
 } from '@/lib/database/game';
+import { handleCreateStoryAchiements } from '@/lib/achievements';
 
 export type CreateCaseResult =
 	| { success: true; caseId: string }
@@ -116,6 +117,7 @@ export const createCaseAction = async (
 				);
 			}
 		});
+		await handleCreateStoryAchiements(authorId);
 
 		revalidatePath('/');
 

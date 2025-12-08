@@ -1,7 +1,7 @@
 import { type GameSession } from '@/types/game';
 
 import { unlockAchievement } from './database/achievement';
-import { getChatHistoryCount } from './database/game';
+import { getChatHistory, getChatHistoryCount } from './database/game';
 
 export const handleAbandonGameAchievements = async (
 	userId: string,
@@ -18,13 +18,20 @@ export const handleCompleteGameAchievements = async (
 ) => {
 	await unlockAchievement('first-case-closed', userId);
 
-	const messageCount = await getChatHistoryCount(gameSessionId);
+	const messages = await getChatHistory(gameSessionId);
+	const playerMessages = messages.filter(message => message.role === 'player');
 
-	if (messageCount < 25) {
+	if (playerMessages.length < 25) {
 		await unlockAchievement('quick-wit', userId);
 	}
 
-	// TODO: Solve a case without hints
+	const usedHints = playerMessages.some(
+		message => message.type === 'hintRequest'
+	);
+
+	if (!usedHints) {
+		await unlockAchievement('master-sleuth', userId);
+	}
 };
 
 export const handleSendMessageAchievements = async (
@@ -38,7 +45,6 @@ export const handleSendMessageAchievements = async (
 	}
 };
 
-// TODO: Use
 export const handleCreateStoryAchiements = async (userId: string) => {
 	await unlockAchievement('storyteller', userId);
 };
