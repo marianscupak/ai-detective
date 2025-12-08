@@ -16,6 +16,8 @@ import {
 	type OngoingUserInvestigation
 } from '@/types/game';
 
+import requireAuth from './require-auth';
+
 export const updateUserProfile = async (data: UpdateProfileDto) => {
 	const validatedInput = await updateProfileSchema.safeParseAsync(data);
 
@@ -34,27 +36,15 @@ export const updateUserProfile = async (data: UpdateProfileDto) => {
 export const getOngoingInvestigations = async (): Promise<
 	OngoingUserInvestigation[]
 > => {
-	const session = await auth.api.getSession({
-		headers: await headers()
-	});
+	const userId = await requireAuth();
 
-	if (!session?.user?.id) {
-		throw new Error('Unauthorized: You must be logged in to send a message.');
-	}
-
-	return await getOngoingUserInvestigations(session.user.id);
+	return await getOngoingUserInvestigations(userId);
 };
 
 export const getCompletedInvestigations = async (): Promise<
 	CompletedUserInvestigation[]
 > => {
-	const session = await auth.api.getSession({
-		headers: await headers()
-	});
+	const userId = await requireAuth();
 
-	if (!session?.user?.id) {
-		throw new Error('Unauthorized: You must be logged in to send a message.');
-	}
-
-	return await getCompletedUserInvestigations(session.user.id);
+	return await getCompletedUserInvestigations(userId);
 };

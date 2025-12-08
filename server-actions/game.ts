@@ -26,6 +26,8 @@ import {
 	handleSendMessageAchievements
 } from '@/lib/achievements';
 
+import requireAuth from './require-auth';
+
 /* -------------------------------------------------------------------------- */
 /* Shared helpers                                                             */
 /* -------------------------------------------------------------------------- */
@@ -357,13 +359,7 @@ export const sendChatMessage = async (
 	gameSessionId: string,
 	message: string
 ) => {
-	const session = await auth.api.getSession({
-		headers: await headers()
-	});
-
-	if (!session?.user?.id) {
-		throw new Error('Unauthorized: You must be logged in to send a message.');
-	}
+	const userId = await requireAuth();
 
 	await saveNewMessage({
 		gameSessionId,
@@ -399,13 +395,13 @@ export const sendChatMessage = async (
 			relevance: parsedData.relevance,
 			reasoning: parsedData.reasoning
 		});
-		await handleSendMessageAchievements(session.user.id, gameSessionId);
+		await handleSendMessageAchievements(userId, gameSessionId);
 
 		await updateGameSessionProgress(gameSessionId, newProgress);
 
 		if (parsedData.isSolved) {
 			await updateGameSessionStatus(gameSessionId, 'completed');
-			await handleCompleteGameAchievements(session.user.id, gameSessionId);
+			await handleCompleteGameAchievements(userId, gameSessionId);
 		}
 
 		return savedMessage;
@@ -417,15 +413,7 @@ export const sendChatMessage = async (
 
 export const loadGameSession = async (caseId: string) => {
 	try {
-		const session = await auth.api.getSession({
-			headers: await headers()
-		});
-
-		if (!session?.user?.id) {
-			throw new Error('Unauthorized: You must be logged in to play.');
-		}
-
-		const userId = session.user.id;
+		const userId = await requireAuth();
 		const caseDetails = await getCaseById(caseId);
 
 		if (!caseDetails) {
@@ -470,19 +458,11 @@ export const getGameSessionStatus = async (gameSessionId: string) => {
 };
 
 export const abandonGameSession = async (gameSessionId: string) => {
-	const session = await auth.api.getSession({
-		headers: await headers()
-	});
-
-	if (!session?.user?.id) {
-		throw new Error(
-			'Unauthorized: You must be logged in to perform this action.'
-		);
-	}
+	const userId = await requireAuth();
 
 	const gameSession = await getGameSessionById(gameSessionId);
 
-	if (gameSession?.userId !== session.user.id) {
+	if (gameSession?.userId !== userId) {
 		throw new Error(
 			'Forbidden: Game session does not exist or belongs to another user.'
 		);
@@ -490,7 +470,7 @@ export const abandonGameSession = async (gameSessionId: string) => {
 
 	try {
 		await updateGameSessionStatus(gameSessionId, 'abandoned');
-		await handleAbandonGameAchievements(session.user.id, gameSession);
+		await handleAbandonGameAchievements(userId, gameSession);
 
 		return { success: true };
 	} catch (error) {
@@ -507,15 +487,7 @@ export const requestHint = async (
 		subtlety?: HintSubtlety;
 	}
 ) => {
-	const session = await auth.api.getSession({
-		headers: await headers()
-	});
-
-	if (!session?.user?.id) {
-		throw new Error(
-			'Unauthorized: You must be logged in to perform this action.'
-		);
-	}
+	await requireAuth();
 
 	try {
 		const gameSession = await getGameSessionById(gameSessionId);

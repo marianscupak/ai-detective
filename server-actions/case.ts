@@ -1,8 +1,5 @@
 'use server';
 
-import { headers } from 'next/headers';
-
-import { auth } from '@/lib/auth';
 import {
 	type CaseLeaderboardEntry,
 	type DetectiveCaseListItem
@@ -15,14 +12,7 @@ import {
 	getCaseById
 } from '@/lib/database/game';
 
-const requireAuth = async () => {
-	const session = await auth.api.getSession({
-		headers: await headers()
-	});
-
-	if (!session?.user?.id) throw new Error('Unauthorized');
-	return session.user.id;
-};
+import requireAuth from './require-auth';
 
 export const getDetectiveCaseById = async (caseId: string) => {
 	await requireAuth();
