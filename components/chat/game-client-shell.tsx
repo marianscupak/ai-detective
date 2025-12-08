@@ -31,6 +31,7 @@ export const GameClientShell = ({
 
 			<div className="w-full lg:w-auto">
 				<SideControls
+					detectiveCase={initialCaseDetails}
 					gameSessionId={initialGameSession.id}
 					setMessages={setMessages}
 				/>
