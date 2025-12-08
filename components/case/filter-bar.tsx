@@ -31,13 +31,13 @@ export const FilterBar = ({
 	};
 
 	return (
-		<div className="mb-10 flex flex-col items-center gap-4 rounded-2xl bg-card p-5 shadow-md md:flex-row">
+		<div className="bg-card mb-10 flex flex-col items-center gap-4 rounded-2xl p-5 shadow-md md:flex-row">
 			<div className="relative w-full md:flex-1">
-				<Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+				<Search className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2" />
 				<input
 					type="text"
 					placeholder="Find case..."
-					className="w-full rounded-xl border border-border py-3 pr-4 pl-11 text-foreground"
+					className="border-border text-foreground w-full rounded-xl border py-3 pr-4 pl-11"
 					value={filters.search}
 					onChange={e => update('search', e.target.value)}
 				/>
@@ -45,7 +45,7 @@ export const FilterBar = ({
 
 			<div className="relative">
 				<select
-					className="cursor-pointer rounded-xl border border-border bg-muted py-3 pr-8 pl-3 text-foreground"
+					className="border-border bg-muted text-foreground cursor-pointer rounded-xl border py-3 pr-8 pl-3"
 					value={filters.theme}
 					onChange={e => update('theme', e.target.value)}
 				>
@@ -61,7 +61,7 @@ export const FilterBar = ({
 
 			<div className="relative">
 				<select
-					className="cursor-pointer rounded-xl border border-border bg-muted py-3 pr-8 pl-10 text-foreground"
+					className="border-border bg-muted text-foreground cursor-pointer rounded-xl border py-3 pr-8 pl-10"
 					value={filters.solved}
 					onChange={e => update('solved', e.target.value)}
 				>
@@ -69,19 +69,19 @@ export const FilterBar = ({
 					<option value="solved">Solved</option>
 					<option value="unsolved">Unsolved</option>
 				</select>
-				<CheckCircle className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+				<CheckCircle className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2" />
 			</div>
 
 			<div className="relative">
 				<select
-					className="cursor-pointer rounded-xl border border-border bg-muted py-3 pr-8 pl-10 text-foreground"
+					className="border-border bg-muted text-foreground cursor-pointer rounded-xl border py-3 pr-8 pl-10"
 					value={filters.date}
 					onChange={e => update('date', e.target.value)}
 				>
 					<option value="newest">Newest first</option>
 					<option value="oldest">Oldest first</option>
 				</select>
-				<Clock className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+				<Clock className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2" />
 			</div>
 		</div>
 	);

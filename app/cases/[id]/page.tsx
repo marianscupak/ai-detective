@@ -29,19 +29,6 @@ export const generateMetadata = async ({
 	};
 };
 
-export const generateMetadata = async ({
-	params
-}: CasePageProps): Promise<Metadata> => {
-	const { id } = await params;
-
-	const detectiveCase = await getDetectiveCaseById(id);
-
-	return {
-		title: detectiveCase.title,
-		description: detectiveCase.summary
-	};
-};
-
 type CasePageProps = {
 	params: Promise<{ id: string }>;
 };
@@ -79,7 +66,7 @@ const CasePage = async ({ params }: CasePageProps) => {
 				<div className="mt-10 flex justify-end">
 					<Link
 						href={`/cases/${id}/investigation`}
-						className="rounded-xl bg-blue-600 px-6 py-3 font-medium text-white shadow transition hover:bg-blue-700"
+						className="rounded-xl bg-blue-700 px-6 py-3 font-medium text-white shadow transition hover:bg-blue-900"
 					>
 						{isSolvedForUser ? 'View Solution' : 'Solve Mystery'}
 					</Link>

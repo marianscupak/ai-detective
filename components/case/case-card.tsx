@@ -21,7 +21,7 @@ export const CaseCard = ({ story }: Props) => {
 				</div>
 
 				{isSolvedForUser ? (
-					<div className="flex items-center gap-1 rounded-full border border-blue-900 px-3 py-1 text-sm font-medium text-blue-900">
+					<div className="flex items-center gap-1 rounded-full border border-blue-700 px-3 py-1 text-sm font-medium text-blue-900">
 						<CheckCircle className="h-4 w-4" />
 						Solved
 					</div>
