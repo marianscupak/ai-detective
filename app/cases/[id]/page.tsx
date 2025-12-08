@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { type Metadata } from 'next';
 
 import { CaseAsideNav } from '@/components/case-aside-nav';
 import {
@@ -14,8 +15,21 @@ import {
 	userHasCompletedCase
 } from '@/server-actions/case';
 
+export const generateMetadata = async ({
+	params
+}: CasePageProps): Promise<Metadata> => {
+	const { id } = await params;
+
+	const detectiveCase = await getDetectiveCaseById(id);
+
+	return {
+		title: detectiveCase.title,
+		description: detectiveCase.summary
+	};
+};
+
 type CasePageProps = {
-	params: { id: string };
+	params: Promise<{ id: string }>;
 };
 
 const CasePage = async ({ params }: CasePageProps) => {
