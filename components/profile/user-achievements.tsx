@@ -16,15 +16,15 @@ const UserAchievementList = async () => {
 						className={cn(
 							'flex flex-col gap-1 rounded-lg border p-2 shadow-sm',
 							ach.isUnlocked
-								? 'border-blue-500 bg-blue-50'
+								? 'border-blue-700 bg-blue-50'
 								: 'border-border bg-muted'
 						)}
 					>
-						<div className="text-sm font-semibold">{ach.title}</div>
-						<p className="text-foreground text-xs">{ach.description}</p>
+						<div className="text-sm font-semibold text-black">{ach.title}</div>
+						<p className="text-xs text-black">{ach.description}</p>
 
 						{ach.isUnlocked ? (
-							<div className="text-xs text-blue-600">
+							<div className="text-xs text-blue-700">
 								Unlocked: {format(ach.earnedAt!, 'dd.MM.yyyy')}{' '}
 							</div>
 						) : (
