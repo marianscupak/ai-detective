@@ -1,19 +1,19 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { CaseAsideNav } from '@/components/case-aside-nav';
-import {
-	CaseHeader,
-	CaseEvidenceSection,
-	CaseCharactersSection,
-	CaseDetailsSection,
-	CaseLeaderboardSection
-} from '@/components/case-sections';
+import { CaseAsideNav } from '@/components/case/case-aside-nav';
 import {
 	getDetectiveCaseById,
 	getLeaderboardForCase,
 	userHasCompletedCase
 } from '@/server-actions/case';
+import {
+	CaseCharactersSection,
+	CaseDetailsSection,
+	CaseEvidenceSection,
+	CaseHeader,
+	CaseLeaderboardSection
+} from '@/components/case/case-sections';
 
 type CasePageProps = {
 	params: { id: string };

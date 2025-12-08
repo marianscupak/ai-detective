@@ -1,0 +1,109 @@
+'use client';
+
+import React from 'react';
+import {
+	useFieldArray,
+	type UseFormReturn,
+	type FieldErrors
+} from 'react-hook-form';
+
+import type { CreateCaseFormValues } from '@/lib/schema/case';
+import { SectionCard } from '@/components/create-case/SectionCard';
+import { FormField } from '@/components/create-case/FormField';
+import { CaseTextarea } from '@/components/create-case/CaseTextarea';
+import { ArrayItemCard } from '@/components/create-case/ArrayItemCard';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+
+type EvidenceSectionProps = {
+	form: UseFormReturn<CreateCaseFormValues>;
+};
+
+export const EvidenceSection: React.FC<EvidenceSectionProps> = ({ form }) => {
+	const {
+		control,
+		register,
+		formState: { errors }
+	} = form;
+
+	const { fields, append, remove } = useFieldArray({
+		control,
+		name: 'evidences'
+	});
+
+	const evidencesError = errors.evidences as
+		| FieldErrors<CreateCaseFormValues['evidences']>
+		| undefined;
+
+	return (
+		<SectionCard title="Evidence">
+			<div className="grid gap-4 md:grid-cols-3">
+				<div className="md:col-span-1">
+					<h2 className="text-sm font-semibold">Suspects</h2>
+					<p className="text-muted-foreground text-xs">
+						Add all important characters in the Case.
+					</p>
+					{typeof errors.evidences === 'object' &&
+						!Array.isArray(errors.evidences) &&
+						errors.evidences && (
+							<p className="mb-2 text-xs text-red-500">
+								{(errors.evidences as any).message}
+							</p>
+						)}
+				</div>
+				<div className="flex flex-col gap-4 md:col-span-2">
+					{fields.map((field, index) => {
+						const fieldError = Array.isArray(evidencesError)
+							? evidencesError[index]
+							: undefined;
+
+						return (
+							<ArrayItemCard
+								key={field.id}
+								title={`Evidence #${index + 1}`}
+								canRemove={fields.length > 1}
+								onRemoveAction={() => remove(index)}
+							>
+								<FormField label="Location" error={fieldError?.location as any}>
+									<Input
+										{...register(`evidences.${index}.location` as const)}
+									/>
+								</FormField>
+								<FormField
+									label="Description (player-facing)"
+									error={fieldError?.description as any}
+								>
+									<CaseTextarea
+										{...register(`evidences.${index}.description` as const)}
+									/>
+								</FormField>
+								<FormField
+									label="Significance (AI-only)"
+									error={fieldError?.significance as any}
+								>
+									<CaseTextarea
+										{...register(`evidences.${index}.significance` as const)}
+									/>
+								</FormField>
+							</ArrayItemCard>
+						);
+					})}
+
+					<Button
+						type="button"
+						variant="outline"
+						onClick={() =>
+							append({
+								location: '',
+								description: '',
+								significance: ''
+							})
+						}
+					>
+						+ Add evidence
+					</Button>
+				</div>
+			</div>
+		</SectionCard>
+	);
+};

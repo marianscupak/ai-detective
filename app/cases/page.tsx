@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 
 import { auth } from '@/lib/auth';
-import CaseLibrary from '@/components/case-library';
+import CaseLibrary from '@/components/case/case-library';
 import {
 	getAllCaseThemes,
 	getAllDetectiveCasesWithStatus

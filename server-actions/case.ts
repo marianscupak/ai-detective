@@ -1,12 +1,15 @@
 'use server';
 
 import { notFound } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 
 import {
+	type DetectiveCase,
 	type CaseLeaderboardEntry,
 	type DetectiveCaseListItem
 } from '@/types/case';
 import {
+	dbCreateCase,
 	dbGetAllCaseThemes,
 	dbGetAllDetectiveCasesWithStatus,
 	dbGetLeaderboardForCase,
@@ -15,6 +18,31 @@ import {
 } from '@/lib/database/game';
 
 import requireAuth from './require-auth';
+
+export type CreateCaseResult =
+	| { success: true; caseId: string }
+	| { success: false; error: string };
+
+export const createCaseAction = async (
+	data: DetectiveCase
+): Promise<CreateCaseResult> => {
+	try {
+		const userId = await requireAuth();
+
+		const caseId = await dbCreateCase(data, userId);
+
+		revalidatePath('/');
+
+		return { success: true, caseId };
+	} catch (error) {
+		console.error('Create case action error:', error);
+
+		return {
+			success: false,
+			error: 'Failed to create case due to server error.'
+		};
+	}
+};
 
 export const getDetectiveCaseById = async (caseId: string) => {
 	await requireAuth();
@@ -47,6 +75,5 @@ export const getLeaderboardForCase = async (
 ): Promise<CaseLeaderboardEntry[]> => {
 	await requireAuth();
 
-	const result = await dbGetLeaderboardForCase(caseId);
-	return result;
+	return await dbGetLeaderboardForCase(caseId);
 };

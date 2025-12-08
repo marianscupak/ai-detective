@@ -1,7 +1,5 @@
 'use server';
 
-import { headers } from 'next/headers';
-
 import {
 	getCaseById,
 	findOrCreateGameSession,
@@ -11,7 +9,6 @@ import {
 	updateGameSessionProgress,
 	getGameSessionById
 } from '@/lib/database/game';
-import { auth } from '@/lib/auth';
 import { type DetectiveCase } from '@/types/case';
 import {
 	aiResponseSchema,
