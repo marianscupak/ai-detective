@@ -73,3 +73,40 @@ export type DetectiveCase = {
 	// --- Optional Context ---
 	notesForAI?: string; // "Optional pole" - A place for the author to give the AI extra instructions or context.
 };
+
+export type DetectiveCaseBaseView = {
+	id: string; // Unique case identifier (e.g. "case-orient-express-01")
+	authorId: string; // ID of the user who created the case
+	createdAt: Date;
+
+	title: string; // Case title shown in library
+	theme: string; // Category / genre (e.g. "train-mystery")
+	summary: string; // Short case summary for previews
+
+	location: string; // Where the crime happened
+	dateTime: string; // When it happened (string stored in DB)
+	incident: string; // Core description of what happened
+
+	// --- Solution (not shown to player) ---
+	culpritCharacterId: string; // Character ID of the culprit
+	motive: string; // Why the culprit committed the crime
+	method: string; // How the crime was executed
+
+	notesForAI?: string | null; // Extra instructions for the AI (optional)
+};
+
+export type DetectiveCaseListItem = DetectiveCaseBaseView & {
+	isSolvedForUser: boolean;
+};
+
+/**
+ * Represents a single leaderboard record for a detective case.
+ * This entry reflects a player's *first completed attempt* at solving the case,
+ * measured by the number of messages the player sent before reaching completion.
+ */
+export type CaseLeaderboardEntry = {
+	userId: string; // The ID of the user associated with this leaderboard entry.
+	userName: string; // The display name of the user.
+	caseId: string; // The ID of the detective case this leaderboard entry belongs to.
+	messageCount: number; // The total number of player messages written during the first completed attempt.
+};

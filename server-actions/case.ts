@@ -9,8 +9,19 @@ import {
 	caseCharacter,
 	caseEvidence
 } from '@/db/schema/game-schema';
-import { type DetectiveCase } from '@/types/case';
+import {
+	type DetectiveCase,
+	type CaseLeaderboardEntry,
+	type DetectiveCaseListItem
+} from '@/types/case';
 import { auth } from '@/lib/auth';
+import {
+	dbGetAllCaseThemes,
+	dbGetAllDetectiveCasesWithStatus,
+	dbGetLeaderboardForCase,
+	dbUserHasCompletedCase,
+	getCaseById
+} from '@/lib/database/game';
 
 export type CreateCaseResult =
 	| { success: true; caseId: string }
@@ -116,4 +127,47 @@ export const createCaseAction = async (
 			error: 'Failed to create case due to server error.'
 		};
 	}
+};
+
+const requireAuth = async () => {
+	const session = await auth.api.getSession({
+		headers: await headers()
+	});
+
+	if (!session?.user?.id) throw new Error('Unauthorized');
+	return session.user.id;
+};
+
+export const getDetectiveCaseById = async (caseId: string) => {
+	await requireAuth();
+
+	const result = await getCaseById(caseId);
+	if (!result) throw new Error('Case not found');
+
+	return result;
+};
+
+export const getAllCaseThemes = async (): Promise<string[]> => {
+	await requireAuth();
+	return await dbGetAllCaseThemes();
+};
+
+export const userHasCompletedCase = async (caseId: string) => {
+	const userId = await requireAuth();
+	return await dbUserHasCompletedCase(userId, caseId);
+};
+
+export const getAllDetectiveCasesWithStatus = async (): Promise<
+	DetectiveCaseListItem[]
+> => {
+	const userId = await requireAuth();
+	return await dbGetAllDetectiveCasesWithStatus(userId);
+};
+
+export const getLeaderboardForCase = async (
+	caseId: string
+): Promise<CaseLeaderboardEntry[]> => {
+	await requireAuth();
+
+	return await dbGetLeaderboardForCase(caseId);
 };
