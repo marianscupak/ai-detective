@@ -13,33 +13,35 @@ export const CaseCard = ({ story }: Props) => {
 	const formattedDate = new Date(createdAt).toLocaleDateString();
 
 	return (
-		<div className="flex flex-col justify-between rounded-2xl border border-gray-200 bg-white p-6 shadow">
+		<div className="border-border bg-card flex flex-col justify-between rounded-2xl border p-6 shadow">
 			<div className="mb-3 flex items-center justify-between">
-				<div className="flex items-center gap-2 text-sm text-gray-500">
-					<Clock className="h-4 w-4 text-gray-400" />
+				<div className="text-muted-foreground flex items-center gap-2 text-sm">
+					<Clock className="text-muted-foreground h-4 w-4" />
 					<span>{formattedDate}</span>
 				</div>
 
 				{isSolvedForUser ? (
-					<div className="flex items-center gap-1 rounded-full border border-blue-700 px-3 py-1 text-sm font-medium text-blue-700">
+					<div className="flex items-center gap-1 rounded-full border border-blue-900 px-3 py-1 text-sm font-medium text-blue-900">
 						<CheckCircle className="h-4 w-4" />
 						Solved
 					</div>
 				) : (
-					<div className="flex items-center gap-1 rounded-full border border-gray-400 px-3 py-1 text-sm font-medium text-gray-600">
+					<div className="text-muted-foreground flex items-center gap-1 rounded-full border border-gray-400 px-3 py-1 text-sm font-medium">
 						<CircleDashed className="h-4 w-4" />
 						Unsolved
 					</div>
 				)}
 			</div>
 
-			<h2 className="mb-3 text-xl font-semibold text-gray-900">{title}</h2>
+			<h2 className="text-foreground mb-3 text-xl font-semibold">{title}</h2>
 
-			<p className="mb-6 text-sm leading-relaxed text-gray-600">{summary}</p>
+			<p className="text-muted-foreground mb-6 text-sm leading-relaxed">
+				{summary}
+			</p>
 
 			<Link
 				href={`/cases/${id}`}
-				className="inline-block rounded-lg bg-blue-500 px-4 py-2 text-center font-medium text-white transition hover:bg-blue-700"
+				className="inline-block rounded-lg bg-blue-700 px-4 py-2 text-center font-medium text-white transition hover:bg-blue-900"
 			>
 				Case details
 			</Link>

@@ -8,7 +8,7 @@ const ProfileInfo = () => {
 	const { data } = authClient.useSession();
 
 	return (
-		<div className="flex h-fit items-center gap-2 rounded-lg border bg-white p-3 shadow-sm">
+		<div className="flex h-fit items-center gap-2 rounded-lg border bg-card p-3 shadow-sm">
 			{data?.user.name}
 			<EditProfileModal />
 		</div>

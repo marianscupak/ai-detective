@@ -31,7 +31,7 @@ export const SignOutButton = ({
 				});
 			}}
 			className={cn(
-				'flex flex-nowrap items-center gap-2 font-medium text-gray-700 transition hover:text-blue-700 dark:text-gray-200',
+				'flex flex-nowrap items-center gap-2 font-medium text-foreground transition hover:text-primary dark:text-foreground',
 				className
 			)}
 		>

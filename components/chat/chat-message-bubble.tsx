@@ -19,10 +19,10 @@ const MessageContentWrapper = ({
 	<div
 		className={cn(
 			'max-w-sm rounded-lg px-4 py-2 text-sm',
-			variant === 'player' && 'bg-primary text-primary-foreground',
+			variant === 'player' && 'text-primary-foreground bg-blue-700',
 			variant === 'gm' && 'bg-muted',
 			variant === 'hintRequest' &&
-				'bg-amber-100 text-amber-950 dark:bg-amber-900 dark:text-amber-50',
+				'text-primary-foreground bg-sky-600 dark:bg-red-900 dark:text-amber-50',
 			variant === 'hintResponse' &&
 				'bg-sky-100 text-sky-950 dark:bg-sky-900 dark:text-sky-50'
 		)}
@@ -74,7 +74,7 @@ export const ChatMessageBubble = ({
 	const PlayerMessageContent = ({ variant }: { variant: BubbleVariant }) => (
 		<div className="flex flex-col items-end gap-1">
 			{!isLoading && message.type === 'hintRequest' && (
-				<span className="text-[10px] font-semibold tracking-wide text-amber-600 uppercase dark:text-amber-300">
+				<span className="text-[10px] font-semibold tracking-wide text-sky-600 uppercase dark:text-amber-300">
 					Hint requested
 				</span>
 			)}
@@ -107,7 +107,9 @@ export const ChatMessageBubble = ({
 		>
 			{!isPlayer && (
 				<Avatar className="h-8 w-8">
-					<AvatarFallback>GM</AvatarFallback>
+					<AvatarFallback>
+						<img src="/images/robot.PNG" alt="GM" />
+					</AvatarFallback>
 				</Avatar>
 			)}
 
@@ -147,7 +149,9 @@ export const ChatMessageBubble = ({
 
 			{isPlayer && (
 				<Avatar className="h-8 w-8">
-					<AvatarFallback>YOU</AvatarFallback>
+					<AvatarFallback>
+						<img src="/images/unnamedsmall.JPG" alt="GM" />
+					</AvatarFallback>
 				</Avatar>
 			)}
 		</div>

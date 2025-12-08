@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 const SigninPage = () => {
 	return (
-		<div className="flex h-full w-full items-center justify-center text-black">
+		<div className="flex h-full w-full items-center justify-center text-foreground">
 			<SigninButton />
 		</div>
 	);

@@ -46,7 +46,11 @@ export const CreateCaseForm: React.FC<CreateCaseFormProps> = ({
 
 			<div className="flex items-center justify-between">
 				<span className="text-muted-foreground text-xs" />
-				<Button type="submit" disabled={isSubmitting}>
+				<Button
+					type="submit"
+					disabled={isSubmitting}
+					className="bg-blue-700 text-white hover:bg-blue-900"
+				>
 					{isSubmitting ? 'Saving...' : 'Save case'}
 				</Button>
 			</div>

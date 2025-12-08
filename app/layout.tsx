@@ -32,10 +32,12 @@ const RootLayout = ({
 	return (
 		<html lang="en">
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} flex h-screen flex-col antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} text-foreground relative flex h-screen flex-col antialiased`}
 			>
+				<div className="pointer-events-none fixed inset-0 -z-20 bg-[url('/images/noir-bg.jpg')] bg-cover bg-center" />
+				<div className="pointer-events-none fixed inset-0 -z-10 bg-black/70" />
 				<Navigation />
-				<div className="flex-1 overflow-auto bg-slate-50">{children}</div>
+				<div className="flex-1 overflow-auto">{children}</div>
 			</body>
 		</html>
 	);
