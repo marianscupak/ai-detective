@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 
 import { type DetectiveCaseListItem } from '@/types/case';
-import { type FilterOptions } from '@/components/filter-bar';
+import { type FilterOptions } from '@/components/case/filter-bar';
 
 export const useCasesFilter = (cases: DetectiveCaseListItem[]) => {
 	const [filters, setFilters] = useState<FilterOptions>({
