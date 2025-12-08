@@ -51,7 +51,7 @@ const CasePage = async ({ params }: CasePageProps) => {
 
 				<div className="mt-10 flex justify-end">
 					<Link
-						href={`/case/${id}/investigation`}
+						href={`/cases/${id}/investigation`}
 						className="rounded-xl bg-blue-600 px-6 py-3 font-medium text-white shadow transition hover:bg-blue-700"
 					>
 						{isSolvedForUser ? 'View Solution' : 'Solve Mystery'}
