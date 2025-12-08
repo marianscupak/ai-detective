@@ -225,7 +225,11 @@ export const RequestHintDialog = ({
 							>
 								Cancel
 							</Button>
-							<Button type="submit" disabled={isHintPending}>
+							<Button
+								type="submit"
+								disabled={isHintPending}
+								className="bg-blue-700 text-white hover:bg-blue-900"
+							>
 								{isHintPending ? 'Requesting hint…' : 'Request Hint'}
 							</Button>
 						</DialogFooter>

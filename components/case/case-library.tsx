@@ -14,16 +14,16 @@ export const CaseLibrary = ({ cases, themes }: LibraryProps) => {
 	const { filteredCases, setFilters } = useCasesFilter(cases);
 
 	return (
-		<div className="min-h-screen bg-gray-100 px-6 py-10">
+		<div className="min-h-screen px-6 py-10">
 			<div className="mx-auto max-w-6xl">
 				<header className="mb-10">
-					<h1 className="text-4xl font-semibold text-gray-900">Cases</h1>
+					<h1 className="text-4xl font-semibold text-foreground">Cases</h1>
 				</header>
 
 				<FilterBar themes={themes} onChange={setFilters} />
 
 				{filteredCases.length === 0 ? (
-					<div className="mt-10 rounded-xl bg-white p-10 text-center text-gray-600 shadow">
+					<div className="mt-10 rounded-xl bg-card p-10 text-center text-muted-foreground shadow">
 						No cases available to solve.
 					</div>
 				) : (

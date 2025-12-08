@@ -23,8 +23,8 @@ export const CaseHeader = ({
 	return (
 		<header id="summary-section" className="mb-10 scroll-mt-4 border-b pb-6">
 			<div className="flex items-center justify-between">
-				<div className="flex items-center gap-2 text-sm text-gray-500">
-					<Clock className="h-4 w-4 text-gray-400" />
+				<div className="text-muted-foreground flex items-center gap-2 text-sm">
+					<Clock className="text-muted-foreground h-4 w-4" />
 					<span>{formattedDate}</span>
 				</div>
 
@@ -34,16 +34,16 @@ export const CaseHeader = ({
 						Solved
 					</div>
 				) : (
-					<div className="flex items-center gap-1 rounded-full border border-gray-400 px-3 py-1 text-sm font-medium text-gray-600">
+					<div className="text-muted-foreground flex items-center gap-1 rounded-full border border-gray-400 px-3 py-1 text-sm font-medium">
 						<CircleDashed className="h-4 w-4" />
 						Unsolved
 					</div>
 				)}
 			</div>
 
-			<h1 className="mt-4 text-4xl font-bold text-gray-900">{Case.title}</h1>
+			<h1 className="text-foreground mt-4 text-4xl font-bold">{Case.title}</h1>
 
-			<p className="mt-4 max-w-2xl text-gray-700">{Case.summary}</p>
+			<p className="text-foreground mt-4 max-w-2xl">{Case.summary}</p>
 		</header>
 	);
 };
@@ -51,11 +51,11 @@ export const CaseHeader = ({
 export const CaseEvidenceSection = ({ Case }: { Case: DetectiveCase }) => (
 	<section
 		id="evidence-section"
-		className="mb-12 scroll-mt-24 rounded-xl bg-white p-6 shadow"
+		className="bg-card mb-12 scroll-mt-24 rounded-xl p-6 shadow"
 	>
-		<h2 className="mb-4 text-2xl font-semibold text-gray-900">Evidence</h2>
+		<h2 className="text-foreground mb-4 text-2xl font-semibold">Evidence</h2>
 
-		<ul className="space-y-3 text-gray-700">
+		<ul className="text-foreground space-y-3">
 			{Case.evidence.map(e => (
 				<li key={e.id} className="border-t pt-3">
 					<strong>{e.location}:</strong> {e.description}
@@ -68,15 +68,15 @@ export const CaseEvidenceSection = ({ Case }: { Case: DetectiveCase }) => (
 export const CaseCharactersSection = ({ Case }: { Case: DetectiveCase }) => (
 	<section
 		id="characters-section"
-		className="mb-12 scroll-mt-24 rounded-xl bg-white p-6 shadow"
+		className="bg-card mb-12 scroll-mt-24 rounded-xl p-6 shadow"
 	>
-		<h2 className="mb-4 text-2xl font-semibold text-gray-900">Characters</h2>
+		<h2 className="text-foreground mb-4 text-2xl font-semibold">Characters</h2>
 
 		<ul className="space-y-6">
 			<li>
 				<h3 className="text-lg font-medium">{Case.characters.player.name}</h3>
-				<p className="text-sm text-gray-500">Player</p>
-				<p className="mt-1 text-gray-700">
+				<p className="text-muted-foreground text-sm">Player</p>
+				<p className="text-foreground mt-1">
 					{Case.characters.player.description}
 				</p>
 			</li>
@@ -85,8 +85,8 @@ export const CaseCharactersSection = ({ Case }: { Case: DetectiveCase }) => (
 				<h3 className="text-lg font-medium">
 					{Case.characters.victimOrTarget.name}
 				</h3>
-				<p className="text-sm text-gray-500">Victim</p>
-				<p className="mt-1 text-gray-700">
+				<p className="text-muted-foreground text-sm">Victim</p>
+				<p className="text-foreground mt-1">
 					{Case.characters.victimOrTarget.description}
 				</p>
 			</li>
@@ -94,8 +94,8 @@ export const CaseCharactersSection = ({ Case }: { Case: DetectiveCase }) => (
 			{Case.characters.suspects.map((character: Character) => (
 				<li key={character.id}>
 					<h3 className="text-lg font-medium">{character.name}</h3>
-					<p className="text-sm text-gray-500">Suspect</p>
-					<p className="mt-1 text-gray-700">{character.description}</p>
+					<p className="text-muted-foreground text-sm">Suspect</p>
+					<p className="text-foreground mt-1">{character.description}</p>
 				</li>
 			))}
 		</ul>
@@ -110,13 +110,13 @@ export const CaseDetailsSection = ({ Case }: { Case: DetectiveCase }) => {
 	return (
 		<section
 			id="case-details-section"
-			className="mb-12 scroll-mt-24 rounded-xl bg-white p-6 shadow"
+			className="bg-card mb-12 scroll-mt-24 rounded-xl p-6 shadow"
 		>
-			<h2 className="mb-4 text-2xl font-semibold text-gray-900">
+			<h2 className="text-foreground mb-4 text-2xl font-semibold">
 				Case Details
 			</h2>
 
-			<ul className="space-y-2 text-gray-700">
+			<ul className="text-foreground space-y-2">
 				<li>
 					<strong>Incident:</strong> {Case.setting.incident}
 				</li>
@@ -141,9 +141,9 @@ export const CaseLeaderboardSection = ({
 }) => (
 	<section
 		id="leaderboard-section"
-		className="mb-12 scroll-mt-24 rounded-xl bg-white p-6 shadow"
+		className="bg-card mb-12 scroll-mt-24 rounded-xl p-6 shadow"
 	>
-		<h2 className="mb-4 text-2xl font-semibold text-gray-900">
+		<h2 className="text-foreground mb-4 text-2xl font-semibold">
 			Top Detectives
 		</h2>
 

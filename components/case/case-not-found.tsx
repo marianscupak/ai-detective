@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const NotFound = () => {
 	return (
-		<div className="bg-background flex h-full w-full items-center justify-center px-4 py-10">
+		<div className="flex h-full w-full items-center justify-center px-4 py-10">
 			<Card className="w-full max-w-sm shadow-md">
 				<CardHeader className="flex items-center justify-center space-y-2 text-center">
 					<AlertTriangle className="text-destructive h-10 w-10" />

@@ -44,7 +44,7 @@ export const AbandonCaseDialog = ({ gameSessionId }: Props) => {
 				<Button
 					variant="destructive"
 					disabled={isAbandonPending}
-					className="w-full justify-start"
+					className="w-full justify-start bg-blue-700 text-white hover:bg-blue-900"
 				>
 					<Trash2 className="mr-2 h-4 w-4" />
 					Abandon Case
@@ -60,7 +60,10 @@ export const AbandonCaseDialog = ({ gameSessionId }: Props) => {
 				</AlertDialogHeader>
 				<AlertDialogFooter>
 					<AlertDialogCancel>Cancel</AlertDialogCancel>
-					<AlertDialogAction onClick={handleAbandonCase}>
+					<AlertDialogAction
+						onClick={handleAbandonCase}
+						className="bg-blue-700 text-white hover:bg-blue-900"
+					>
 						Abandon Case
 					</AlertDialogAction>
 				</AlertDialogFooter>

@@ -16,19 +16,19 @@ const UserAchievementList = async () => {
 						className={cn(
 							'flex flex-col gap-1 rounded-lg border p-2 shadow-sm',
 							ach.isUnlocked
-								? 'border-green-500 bg-green-50'
-								: 'border-gray-300 bg-gray-100'
+								? 'border-blue-700 bg-blue-50'
+								: 'border-border bg-muted'
 						)}
 					>
-						<div className="text-sm font-semibold">{ach.title}</div>
-						<p className="text-xs text-gray-700">{ach.description}</p>
+						<div className="text-sm font-semibold text-black">{ach.title}</div>
+						<p className="text-xs text-black">{ach.description}</p>
 
 						{ach.isUnlocked ? (
-							<div className="text-xs text-green-600">
+							<div className="text-xs text-blue-700">
 								Unlocked: {format(ach.earnedAt!, 'dd.MM.yyyy')}{' '}
 							</div>
 						) : (
-							<div className="text-xs font-medium text-gray-700">Locked</div>
+							<div className="text-foreground text-xs font-medium">Locked</div>
 						)}
 					</li>
 				))}
@@ -40,7 +40,7 @@ const UserAchievementList = async () => {
 const UserAchievements = () => {
 	return (
 		<div className="h-full flex-1 overflow-auto">
-			<div className="flex flex-col rounded-lg border bg-white p-2 shadow-sm md:h-full">
+			<div className="bg-card flex flex-col rounded-lg border p-2 shadow-sm md:h-full">
 				<h2 className="pb-2 text-xl font-semibold md:text-center md:text-base lg:text-xl">
 					Achievements
 				</h2>

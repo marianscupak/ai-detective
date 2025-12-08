@@ -129,7 +129,7 @@ const CreateCasePage: React.FC = () => {
 
 	return (
 		<FormProvider {...formMethods}>
-			<div className="flex w-full justify-center bg-zinc-50 px-4 py-8 dark:bg-black">
+			<div className="flex w-full justify-center px-4 py-8">
 				<div className="flex w-full max-w-5xl flex-col gap-6">
 					<div className="flex items-center justify-between">
 						<h1 className="text-2xl font-semibold tracking-tight">
@@ -137,7 +137,7 @@ const CreateCasePage: React.FC = () => {
 						</h1>
 						<Link
 							href="/"
-							className="border-input bg-background ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring inline-flex h-10 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+							className="inline-flex h-10 items-center justify-center rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-900 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
 						>
 							Back to home
 						</Link>
@@ -152,7 +152,7 @@ const CreateCasePage: React.FC = () => {
 
 					{output && (
 						<SectionCard title="Generated DetectiveCase JSON">
-							<pre className="max-h-[400px] overflow-auto rounded-md bg-zinc-900 p-4 text-xs text-zinc-100">
+							<pre className="bg-muted text-foreground max-h-[400px] overflow-auto rounded-md p-4 text-xs">
 								{output}
 							</pre>
 						</SectionCard>

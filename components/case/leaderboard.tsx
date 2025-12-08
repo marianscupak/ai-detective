@@ -11,7 +11,7 @@ type Props = {
 export const Leaderboard = ({ entries }: Props) => {
 	if (entries.length === 0) {
 		return (
-			<div className="rounded-xl border border-gray-200 bg-white p-6 text-gray-600 shadow">
+			<div className="rounded-xl border border-border bg-card p-6 text-muted-foreground shadow">
 				No players have solved this case yet.
 			</div>
 		);
@@ -22,16 +22,16 @@ export const Leaderboard = ({ entries }: Props) => {
 			case 0:
 				return 'text-yellow-500';
 			case 1:
-				return 'text-gray-400';
+				return 'text-muted-foreground';
 			case 2:
 				return 'text-amber-700';
 			default:
-				return 'text-gray-500';
+				return 'text-muted-foreground';
 		}
 	};
 
 	return (
-		<div className="rounded-xl border border-gray-200 bg-white p-6 shadow">
+		<div className="rounded-xl border border-border bg-card p-6 shadow">
 			<h2 className="mb-6 flex items-center gap-2 text-2xl font-semibold">
 				<Trophy className="h-6 w-6 text-yellow-500" />
 				Top Detectives
@@ -41,19 +41,19 @@ export const Leaderboard = ({ entries }: Props) => {
 				{entries.map((entry, index) => (
 					<div
 						key={entry.userId}
-						className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3"
+						className="flex items-center justify-between rounded-lg border border-border bg-muted px-4 py-3"
 					>
 						<div className="flex items-center gap-3">
 							<Medal className={`h-6 w-6 ${medalColor(index)}`} />
 							<div>
-								<p className="font-medium text-gray-900">{entry.userName}</p>
-								<p className="text-sm text-gray-500">
+								<p className="font-medium text-foreground">{entry.userName}</p>
+								<p className="text-sm text-muted-foreground">
 									{entry.messageCount} messages
 								</p>
 							</div>
 						</div>
 
-						<span className="text-xl font-bold text-gray-700">
+						<span className="text-xl font-bold text-foreground">
 							#{index + 1}
 						</span>
 					</div>

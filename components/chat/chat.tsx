@@ -135,7 +135,7 @@ export const Chat = ({
 					</div>
 					<div className="bg-muted h-2 w-full overflow-hidden rounded-full">
 						<div
-							className="bg-primary h-full rounded-full transition-all"
+							className="h-full rounded-full bg-blue-700 transition-all"
 							style={{ width: `${currentProgress * 100}%` }}
 						/>
 					</div>
@@ -200,7 +200,12 @@ export const Chat = ({
 							onChange={e => setInput(e.target.value)}
 							disabled={isPending}
 						/>
-						<Button type="submit" size="icon" disabled={isPending}>
+						<Button
+							type="submit"
+							size="icon"
+							disabled={isPending}
+							className="bg-blue-700 text-white hover:bg-blue-900"
+						>
 							<SendHorizontal className="h-4 w-4" />
 							<span className="sr-only">Send</span>
 						</Button>

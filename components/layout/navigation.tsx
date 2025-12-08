@@ -15,11 +15,11 @@ export const Navigation = () => {
 	const pathname = usePathname();
 
 	return (
-		<nav className="sticky top-0 z-50 w-full bg-white shadow-sm dark:bg-gray-900">
+		<nav className="sticky top-0 z-50 w-full bg-card border-b border-border shadow-sm">
 			<div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
 				<Link
 					href="/cases"
-					className="text-2xl font-semibold tracking-wide text-gray-900 hover:text-blue-700 dark:text-white"
+					className="text-2xl font-semibold tracking-wide text-foreground hover:text-primary dark:text-foreground"
 				>
 					AI DETECTIVE
 				</Link>
@@ -32,7 +32,7 @@ export const Navigation = () => {
 							<Link
 								key={item.href}
 								href={item.href}
-								className="relative font-medium text-gray-700 transition hover:text-blue-700 dark:text-gray-200"
+								className="relative font-medium text-foreground transition hover:text-primary dark:text-foreground"
 							>
 								{item.label}
 
@@ -56,8 +56,8 @@ export const Navigation = () => {
 								className={`rounded-lg p-2 transition ${
 									isActive
 										? 'text-blue-600'
-										: 'text-gray-700 dark:text-gray-200'
-								} hover:text-blue-700`}
+										: 'text-foreground dark:text-foreground'
+								} hover:text-primary`}
 							>
 								<Icon className="h-6 w-6" />
 							</Link>

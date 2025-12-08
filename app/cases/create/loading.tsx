@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const Loading = () => {
 	return (
-		<div className="flex w-full justify-center bg-zinc-50 px-4 py-8 dark:bg-black">
+		<div className="flex w-full justify-center bg-background px-4 py-8 dark:bg-black">
 			<div className="flex w-full max-w-5xl flex-col gap-6">
 				{/* Header skeleton */}
 				<div className="flex items-center justify-between">
