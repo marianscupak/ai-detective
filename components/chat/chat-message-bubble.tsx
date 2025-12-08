@@ -108,7 +108,7 @@ export const ChatMessageBubble = ({
 			{!isPlayer && (
 				<Avatar className="h-8 w-8">
 					<AvatarFallback>
-						<img src="/images/robot.PNG" alt="GM" />
+						<img src="/images/robot.png" alt="GM" />
 					</AvatarFallback>
 				</Avatar>
 			)}
@@ -150,7 +150,7 @@ export const ChatMessageBubble = ({
 			{isPlayer && (
 				<Avatar className="h-8 w-8">
 					<AvatarFallback>
-						<img src="/images/unnamedsmall.JPG" alt="GM" />
+						<img src="/images/detective.jpg" alt="GM" />
 					</AvatarFallback>
 				</Avatar>
 			)}

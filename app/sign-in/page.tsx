@@ -1,17 +1,17 @@
 import { type Metadata } from 'next';
+import { Suspense } from 'react';
+import { Loader } from 'lucide-react';
 
-import { SigninButton } from '../../components/layout/sign-in-button';
+import { SignInButtons } from '@/components/sign-in/sign-in-buttons';
 
 export const metadata: Metadata = {
 	title: 'Sign In'
 };
 
-const SigninPage = () => {
-	return (
-		<div className="flex h-full w-full items-center justify-center text-foreground">
-			<SigninButton />
-		</div>
-	);
-};
+const LoginPage = () => (
+	<Suspense fallback={<Loader />}>
+		<SignInButtons />
+	</Suspense>
+);
 
-export default SigninPage;
+export default LoginPage;
