@@ -209,25 +209,31 @@ export const getOngoingUserInvestigations = async (userId: string) => {
 };
 
 export const getCompletedUserInvestigations = async (userId: string) => {
-	return await db
+	return db
 		.select({
 			caseId: detectiveCase.id,
 			caseTitle: detectiveCase.title,
 			sessionId: gameSession.id,
-			startedAt: gameSession.updatedAt,
+			startedAt: gameSession.startedAt,
 			messages: count(chatMessage.id)
 		})
-		.from(detectiveCase)
-		.innerJoin(gameSession, eq(detectiveCase.id, gameSession.caseId))
+		.from(gameSession)
+		.innerJoin(detectiveCase, eq(detectiveCase.id, gameSession.caseId))
 		.leftJoin(
 			chatMessage,
 			and(
-				eq(gameSession.id, chatMessage.gameSessionId),
+				eq(chatMessage.gameSessionId, gameSession.id),
 				eq(chatMessage.role, 'player')
 			)
 		)
 		.where(
 			and(eq(gameSession.userId, userId), eq(gameSession.status, 'completed'))
+		)
+		.groupBy(
+			detectiveCase.id,
+			detectiveCase.title,
+			gameSession.id,
+			gameSession.startedAt
 		);
 };
 
