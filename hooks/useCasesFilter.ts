@@ -23,12 +23,12 @@ export const useCasesFilter = (cases: DetectiveCaseListItem[]) => {
 			result = result.filter(story => {
 				const title = story.title.toLowerCase();
 				const theme = story.theme.toLowerCase();
-				const incident = story.incident.toLowerCase();
+				const summary = story.summary.toLowerCase();
 
 				return (
 					title.includes(searchText) ||
 					theme.includes(searchText) ||
-					incident.includes(searchText)
+					summary.includes(searchText)
 				);
 			});
 		}
