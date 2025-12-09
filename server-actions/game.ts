@@ -157,6 +157,9 @@ GAME RULES FOR THE NARRATIVE:
 - Use second person ("you") when addressing the player.
 - Do not mention that you are an AI or that you have access to "secret info", IDs, or internal data structures.
 - Never mention internal IDs like [${culpritId}] explicitly to the player.
+- You must strictly follow the narrative, characters, lore, evidence, and intended solution of THIS specific detective case.
+- Do not invent new culprits, new motives, new magical rules, new evidence, or new story branches that contradict or override the case data.
+- All foreshadowing, hints, and narrative descriptions must remain fully consistent with the established case facts and the secret solution provided below.
 
 RESPONSE FORMAT (VERY IMPORTANT):
 You MUST respond with a single, valid JSON object and NOTHING ELSE. No markdown, no backticks, no additional text.
