@@ -35,7 +35,10 @@ export const SideControls = ({
 					setMessages={setMessages}
 					disabled={isGameFinished}
 				/>
-				<AbandonCaseDialog gameSessionId={gameSessionId} />
+				<AbandonCaseDialog
+					gameSessionId={gameSessionId}
+					disabled={isGameFinished}
+				/>
 			</CardContent>
 		</Card>
 	);

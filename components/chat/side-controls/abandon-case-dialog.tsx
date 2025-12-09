@@ -20,9 +20,10 @@ import { abandonGameSession } from '@/server-actions/game';
 
 type Props = {
 	gameSessionId: string;
+	disabled?: boolean;
 };
 
-export const AbandonCaseDialog = ({ gameSessionId }: Props) => {
+export const AbandonCaseDialog = ({ gameSessionId, disabled }: Props) => {
 	const [isAbandonPending, startAbandonTransition] = useTransition();
 
 	const router = useRouter();
@@ -43,7 +44,7 @@ export const AbandonCaseDialog = ({ gameSessionId }: Props) => {
 			<AlertDialogTrigger asChild>
 				<Button
 					variant="destructive"
-					disabled={isAbandonPending}
+					disabled={isAbandonPending || disabled}
 					className="w-full justify-start bg-blue-700 text-white hover:bg-blue-900"
 				>
 					<Trash2 className="mr-2 h-4 w-4" />
