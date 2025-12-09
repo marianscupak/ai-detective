@@ -7,7 +7,7 @@ export const handleAbandonGameAchievements = async (
 	userId: string,
 	game: GameSession
 ) => {
-	if (game.progress >= 0.9) {
+	if (game.progress >= 0.9 && game.status !== 'completed') {
 		await unlockAchievement('so-close-yet-so-far', userId);
 	}
 };
